@@ -6,6 +6,13 @@ export default async function handler(req, res) {
     });
   }
 
+  // La prueba permanece desactivada por defecto.
+  if (process.env.HABILITAR_PRUEBA_GUARDADO !== "si") {
+    return res.status(403).json({
+      error: "Prueba de guardado desactivada"
+    });
+  }
+
   const url = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
   const key = process.env.SUPABASE_SECRET_KEY?.trim();
 
