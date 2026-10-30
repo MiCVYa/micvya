@@ -27,10 +27,13 @@ export default async function handler(req, res) {
     );
 
     if (!response.ok) {
-      return res.status(502).json({
-        error: "No se pudo conectar con Supabase"
-      });
-    }
+  console.error("Supabase respondió con estado:", response.status);
+
+  return res.status(502).json({
+    error: "No se pudo conectar con Supabase",
+    codigo_supabase: response.status
+  });
+}
 
     return res.status(200).json({
       conectado: true,
