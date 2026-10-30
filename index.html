@@ -70,7 +70,7 @@
 <section class="step"><h2>¡Últimos detalles!</h2><label>Habilidades</label><textarea id="habilidades" placeholder="Ej: Trabajo en equipo, organización"></textarea><label>Idiomas</label><input id="idiomas" placeholder="Ej: Español nativo, inglés básico"></section>
 <section class="step"><h2>Elegí tu diseño</h2><div class="choices"><button type="button" class="choice selected" id="modernBtn" onclick="choose('modern')">Moderno con foto opcional</button><button type="button" class="choice" id="atsBtn" onclick="choose('ats')">Simple compatible con ATS (sin foto)</button></div><div id="photoFields"><label>Foto (opcional, hasta 5 MB)</label><input type="file" id="foto" accept="image/*" onchange="photoChanged(event)"></div><p class="hint">El diseño ATS utiliza una columna y texto seleccionable. No garantiza superar todos los sistemas de selección.</p></section>
 <div class="actions"><button class="secondary" id="back" onclick="move(-1)" hidden>Volver</button><button class="primary" id="next" onclick="move(1)">Continuar</button></div></div>
-<div class="card" id="previewCard" hidden><div class="no-print"><h2>¡Tu currículum está listo!</h2><p>Revisá tus datos antes de guardar.</p></div><div class="preview" id="preview"></div><div class="actions no-print"><button class="secondary" onclick="editCV()">Editar datos</button><button class="primary" onclick="window.print()">Guardar como PDF</button></div><p class="hint no-print">En la ventana de impresión elegí «Guardar como PDF». Desactivá «Encabezados y pies de página» para evitar que el navegador agregue fecha, dirección web o número de página. Esta versión todavía no incluye pagos ni inteligencia artificial.</p></div>
+<div class="card" id="previewCard" hidden><div class="no-print"><h2>¡Tu currículum está listo!</h2><p>Revisá tus datos antes de guardar.</p></div><div class="preview" id="preview"></div><div class="actions no-print"><button class="secondary" onclick="editCV()">Editar datos</button><button class="primary" onclick="window.print()">Guardar como PDF</button><button class="secondary" id="testPaymentBtn" onclick="testPayment()">Probar pago de $5.000</button></div><p class="hint no-print">En la ventana de impresión elegí «Guardar como PDF». Desactivá «Encabezados y pies de página» para evitar que el navegador agregue fecha, dirección web o número de página. El botón de pago es solo para pruebas. La descarga del PDF todavía no está protegida y no incluye inteligencia artificial.</p></div>
 </main><footer>MiCVYa © 2026</footer><script>
 let current=0,design='modern',photoData='';const steps=[...document.querySelectorAll('.step')];const el=id=>document.getElementById(id),val=id=>el(id).value.trim();const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function start(){el('welcome').hidden=true;el('builder').hidden=false;window.scrollTo(0,0)}function update(){steps.forEach((s,i)=>s.classList.toggle('active',i===current));el('bar').style.width=(100*(current+1)/steps.length)+'%';el('back').hidden=current===0;el('next').textContent=current===steps.length-1?'Crear mi CV':'Continuar'}function move(d){if(d===1&&current===0&&(!val('nombre')||!val('telefono'))){alert('Completá tu nombre y teléfono.');return}if(current+d>=steps.length){showCV();return}current=Math.max(0,current+d);update();window.scrollTo(0,0)}function choose(d){design=d;el('modernBtn').classList.toggle('selected',d==='modern');el('atsBtn').classList.toggle('selected',d==='ats');el('photoFields').hidden=d==='ats'}function photoChanged(e){const f=e.target.files[0];photoData='';if(!f)return;if(!f.type.startsWith('image/')||f.size>5*1024*1024){alert('Elegí una imagen de hasta 5 MB.');e.target.value='';return}const r=new FileReader();r.onload=()=>photoData=r.result;r.readAsDataURL(f)}function section(title,id){return val(id)?'<section><h3>'+title+'</h3><p>'+safe(val(id))+'</p></section>':''}function showCV(){
  const name=safe(val('nombre'));
@@ -104,4 +104,24 @@ let current=0,design='modern',photoData='';const steps=[...document.querySelecto
  el('builder').hidden=true;el('previewCard').hidden=false;window.scrollTo(0,0);
 }
 function editCV(){el('previewCard').hidden=true;el('builder').hidden=false;current=steps.length-1;update();window.scrollTo(0,0)}
+async function testPayment(){
+ const button=el('testPaymentBtn');
+ button.disabled=true;
+ button.textContent='Preparando pago de prueba...';
+ try{
+  const response=await fetch('/api/crear-pago',{method:'POST'});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||'No se pudo preparar el pago');
+  if(!data.checkoutUrl)throw new Error('Mercado Pago no devolvió un enlace de prueba');
+  const url=new URL(data.checkoutUrl);
+  if(url.protocol!=='https:' || !(['mercadopago.com.ar','mercadopago.com'].some(d=>url.hostname===d||url.hostname.endsWith('.'+d)))){
+   throw new Error('El enlace de pago no pertenece a Mercado Pago');
+  }
+  window.location.assign(url.href);
+ }catch(error){
+  alert('No se pudo abrir el pago de prueba: '+error.message);
+  button.disabled=false;
+  button.textContent='Probar pago de $5.000';
+ }
+}
 </script></body></html>
