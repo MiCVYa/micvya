@@ -16,9 +16,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const proyecto = new URL(url).hostname.split(".")[0].slice(0, 4);
+    const base = new URL(url);
+    const proyecto = base.hostname.split(".")[0].slice(0, 4);
 
-    const response = await fetch(`${url}/rest/v1/`, {
+    // Comprobamos cómo se está construyendo la dirección.
+    const ruta = new URL("/rest/v1/", base);
+
+    const response = await fetch(ruta.toString(), {
       method: "GET",
       headers: {
         apikey: key,
@@ -26,32 +30,27 @@ export default async function handler(req, res) {
       }
     });
 
-    if (!response.ok) {
-      let codigo = null;
+    let codigo = null;
 
+    if (!response.ok) {
       try {
         const detalle = await response.json();
         codigo = detalle.code ?? null;
       } catch {}
-
-      return res.status(502).json({
-        conectado: false,
-        proyecto,
-        codigo_supabase: response.status,
-        detalle_codigo: codigo
-      });
     }
 
     return res.status(200).json({
-      conectado: true,
       proyecto,
-      mensaje: "La API de Supabase responde correctamente"
+      protocolo: ruta.protocol,
+      ruta: ruta.pathname,
+      codigo_supabase: response.status,
+      detalle_codigo: codigo,
+      conectado: response.ok
     });
 
   } catch {
     return res.status(500).json({
-      conectado: false,
-      error: "Error al consultar la API de Supabase"
+      error: "No se pudo completar la prueba"
     });
   }
 }
