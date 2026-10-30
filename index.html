@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiCVYa | Tu currículum fácil</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#20263a}
+header{background:#172554;color:white;padding:22px 7%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:800}
+.logo span{color:#60a5fa}
+header small{color:#dbeafe}
+main{max-width:850px;margin:38px auto;padding:0 18px}
+.card{background:white;border-radius:18px;padding:30px;box-shadow:0 8px 30px #17255412}
+h1{font-size:32px;margin:0 0 12px}
+h2{margin-top:0}
+p{line-height:1.5;color:#64748b}
+.tag{color:#2563eb;font-weight:bold;font-size:13px}
+label{display:block;font-weight:bold;margin:17px 0 7px}
+input,textarea{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:9px;font-size:16px;font-family:inherit}
+textarea{min-height:95px;resize:vertical}
+button{border:0;border-radius:10px;padding:14px 20px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{background:#2563eb;color:white}
+.secondary{background:#e2e8f0;color:#1e293b}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.progress{height:8px;background:#e2e8f0;border-radius:20px;margin:22px 0;overflow:hidden}
+.progress div{height:100%;background:#2563eb;width:20%;transition:.2s}
+.step{display:none}.step.active{display:block}
+.hint{font-size:13px;color:#64748b}
+.preview{border:1px solid #cbd5e1;padding:28px;background:white;color:#1e293b}
+.preview h2{color:#1d4ed8;margin-bottom:5px}
+.preview h3{border-bottom:1px solid #cbd5e1;padding-bottom:6px;margin-top:24px}
+.preview p{white-space:pre-wrap;color:#334155}
+footer{text-align:center;color:#64748b;padding:25px;font-size:13px}
+@media(max-width:600px){header{padding:18px}.card{padding:20px}h1{font-size:27px}.actions button{width:100%}}
+@media print{
+body{background:white}
+header,main>.card:not(#previewCard),footer,.no-print{display:none!important}
+main{margin:0;padding:0;max-width:none}
+#previewCard{display:block!important;box-shadow:none;border:0;padding:0}
+.preview{border:0;padding:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">MiCV<span>Ya</span></div>
+  <small>Tu futuro empieza hoy</small>
+</header>
+
+<main>
+<div class="card" id="builder">
+  <div class="tag">CREÁ TU CURRÍCULUM</div>
+  <h1>Conseguí un trabajo con un buen CV.</h1>
+  <p>Completá tus datos paso a paso. Es fácil, rápido y no necesitás experiencia en informática.</p>
+  <div class="progress"><div id="bar"></div></div>
+
+  <section class="step active">
+    <h2>Primero, ¿cómo te llamás?</h2>
+    <p>Escribí tu nombre y tus datos de contacto.</p>
+    <label>Nombre y apellido *</label>
+    <input id="nombre" placeholder="Ej: Juan Pérez">
+    <label>Teléfono *</label>
+    <input id="telefono" placeholder="Ej: 11 1234 5678">
+    <label>Correo electrónico</label>
+    <input id="email" type="email" placeholder="Ej: juan@gmail.com">
+    <label>Localidad y provincia</label>
+    <input id="ciudad" placeholder="Ej: Cipolletti, Río Negro">
+  </section>
+
+  <section class="step">
+    <h2>¿Qué trabajo estás buscando?</h2>
+    <label>Puesto o profesión</label>
+    <input id="puesto" placeholder="Ej: Repositor, administrativo, vendedor">
+    <label>Un breve perfil sobre vos</label>
+    <textarea id="perfil" placeholder="Ej: Soy responsable, puntual y tengo ganas de aprender."></textarea>
+    <p class="hint">Contá brevemente cómo sos y qué trabajo buscás.</p>
+  </section>
+
+  <section class="step">
+    <h2>¿Dónde trabajaste?</h2>
+    <label>Experiencia laboral</label>
+    <textarea id="experiencia" placeholder="Empresa, puesto y tareas que realizabas."></textarea>
+    <p class="hint">¿Nunca trabajaste? No hay problema. Podés dejarlo vacío.</p>
+  </section>
+
+  <section class="step">
+    <h2>¿Qué estudios tenés?</h2>
+    <label>Educación</label>
+    <textarea id="educacion" placeholder="Ej: Secundario completo, Escuela..."></textarea>
+    <label>Cursos o capacitaciones</label>
+    <textarea id="cursos" placeholder="Ej: Excel, atención al cliente, manipulación de alimentos."></textarea>
+  </section>
+
+  <section class="step">
+    <h2>¡Últimos detalles!</h2>
+    <label>Habilidades</label>
+    <textarea id="habilidades" placeholder="Ej: Trabajo en equipo, responsabilidad, organización."></textarea>
+    <label>Idiomas</label>
+    <input id="idiomas" placeholder="Ej: Español nativo, inglés básico">
+    <p>¡Listo! Ahora vamos a preparar tu currículum.</p>
+  </section>
+
+  <div class="actions">
+    <button class="secondary" id="back" onclick="move(-1)" style="display:none">Volver</button>
+    <button class="primary" id="next" onclick="move(1)">Continuar</button>
+  </div>
+</div>
+
+<div class="card" id="previewCard" style="display:none;margin-top:25px">
+  <h2 class="no-print">¡Tu currículum está listo!</h2>
+  <p class="no-print">Revisá los datos antes de imprimir o guardar como PDF.</p>
+  <div class="preview" id="preview"></div>
+  <div class="actions no-print">
+    <button class="secondary" onclick="editCV()">Editar datos</button>
+    <button class="primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+  </div>
+  <p class="hint no-print">Esta versión inicial permite guardar el CV desde el navegador. Todavía no incluye pagos ni inteligencia artificial.</p>
+</div>
+</main>
+
+<footer>MiCVYa © 2026 · Tu currículum, más fácil.</footer>
+
+<script>
+let current=0;
+const steps=document.querySelectorAll('.step');
+function move(direction){
+  if(direction===1 && current===0){
+    if(!document.getElementById('nombre').value.trim() ||
+       !document.getElementById('telefono').value.trim()){
+      alert('Completá tu nombre y teléfono para continuar.');
+      return;
+    }
+  }
+  current+=direction;
+  if(current>=steps.length){showCV();return}
+  current=Math.max(0,current);
+  steps.forEach((s,i)=>s.classList.toggle('active',i===current));
+  document.getElementById('bar').style.width=((current+1)*20)+'%';
+  document.getElementById('back').style.display=current===0?'none':'inline-block';
+  document.getElementById('next').textContent=current===steps.length-1?'Crear mi CV':'Continuar';
+}
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+function safe(value){
+  return value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function section(title,id){
+  const value=val(id);
+  return value?'<h3>'+title+'</h3><p>'+safe(value)+'</p>':'';
+}
+function showCV(){
+  const name=safe(val('nombre'));
+  document.getElementById('preview').innerHTML=`
+    <h2>${name}</h2>
+    <p>${safe(val('telefono'))}${val('email')?' · '+safe(val('email')):''}${val('ciudad')?' · '+safe(val('ciudad')):''}</p>
+    ${val('puesto')?'<h3>OBJETIVO LABORAL</h3><p>'+safe(val('puesto'))+'</p>':''}
+    ${section('PERFIL PROFESIONAL','perfil')}
+    ${section('EXPERIENCIA LABORAL','experiencia')}
+    ${section('EDUCACIÓN','educacion')}
+    ${section('CURSOS Y CAPACITACIONES','cursos')}
+    ${section('HABILIDADES','habilidades')}
+    ${section('IDIOMAS','idiomas')}
+  `;
+  document.getElementById('builder').style.display='none';
+  document.getElementById('previewCard').style.display='block';
+  window.scrollTo(0,0);
+}
+function editCV(){
+  document.getElementById('previewCard').style.display='none';
+  document.getElementById('builder').style.display='block';
+  current=4;
+  steps.forEach((s,i)=>s.classList.toggle('active',i===current));
+  document.getElementById('bar').style.width='100%';
+  document.getElementById('back').style.display='inline-block';
+  document.getElementById('next').textContent='Crear mi CV';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
