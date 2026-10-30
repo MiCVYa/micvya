@@ -15,40 +15,27 @@ export default async function handler(req, res) {
     });
   }
 
-  let proyecto = "No identificado";
-
   try {
-    const hostname = new URL(url).hostname;
-    const referencia = hostname.split(".")[0];
-    proyecto = referencia.substring(0, 4);
-  } catch {
-    return res.status(500).json({
-      error: "La dirección de Supabase no es válida"
-    });
-  }
+    const proyecto = new URL(url).hostname.split(".")[0].slice(0, 4);
 
-  try {
-    const response = await fetch(
-      `${url}/rest/v1/solicitudes_cv?select=id&limit=1`,
-      {
-        headers: {
-          apikey: key,
-          Accept: "application/json"
-        }
+    const response = await fetch(`${url}/rest/v1/`, {
+      method: "GET",
+      headers: {
+        apikey: key,
+        Accept: "application/openapi+json"
       }
-    );
+    });
 
     if (!response.ok) {
-      const body = await response.text();
-
       let codigo = null;
 
       try {
-        codigo = JSON.parse(body).code ?? null;
+        const detalle = await response.json();
+        codigo = detalle.code ?? null;
       } catch {}
 
       return res.status(502).json({
-        error: "No se pudo conectar con Supabase",
+        conectado: false,
         proyecto,
         codigo_supabase: response.status,
         detalle_codigo: codigo
@@ -58,13 +45,13 @@ export default async function handler(req, res) {
     return res.status(200).json({
       conectado: true,
       proyecto,
-      mensaje: "MiCVYa conectado correctamente con Supabase"
+      mensaje: "La API de Supabase responde correctamente"
     });
 
   } catch {
     return res.status(500).json({
-      error: "Error de conexión",
-      proyecto
+      conectado: false,
+      error: "Error al consultar la API de Supabase"
     });
   }
 }
