@@ -15,6 +15,18 @@ export default async function handler(req, res) {
     });
   }
 
+  let proyecto = "No identificado";
+
+  try {
+    const hostname = new URL(url).hostname;
+    const referencia = hostname.split(".")[0];
+    proyecto = referencia.substring(0, 4);
+  } catch {
+    return res.status(500).json({
+      error: "La dirección de Supabase no es válida"
+    });
+  }
+
   try {
     const response = await fetch(
       `${url}/rest/v1/solicitudes_cv?select=id&limit=1`,
@@ -29,9 +41,6 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const body = await response.text();
 
-      console.error("Supabase HTTP:", response.status);
-      console.error("Detalle:", body);
-
       let codigo = null;
 
       try {
@@ -40,6 +49,7 @@ export default async function handler(req, res) {
 
       return res.status(502).json({
         error: "No se pudo conectar con Supabase",
+        proyecto,
         codigo_supabase: response.status,
         detalle_codigo: codigo
       });
@@ -47,12 +57,14 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       conectado: true,
+      proyecto,
       mensaje: "MiCVYa conectado correctamente con Supabase"
     });
 
-  } catch (error) {
+  } catch {
     return res.status(500).json({
-      error: "Error de conexión"
+      error: "Error de conexión",
+      proyecto
     });
   }
 }
