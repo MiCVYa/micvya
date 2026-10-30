@@ -11,9 +11,11 @@ export default async function handler(req, res) {
   }
 
   const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+
   const supabaseUrl = process.env.SUPABASE_URL
     ?.trim()
     .replace(/\/+$/, "");
+
   const supabaseKey = process.env.SUPABASE_SECRET_KEY?.trim();
 
   if (!token || !supabaseUrl || !supabaseKey) {
@@ -36,9 +38,16 @@ export default async function handler(req, res) {
   }
 
   const campos = [
-    "nombre", "telefono", "email", "ciudad",
-    "perfil", "experiencia", "educacion",
-    "cursos", "habilidades", "idiomas"
+    "nombre",
+    "telefono",
+    "email",
+    "ciudad",
+    "perfil",
+    "experiencia",
+    "educacion",
+    "cursos",
+    "habilidades",
+    "idiomas"
   ];
 
   for (const campo of campos) {
@@ -67,9 +76,14 @@ export default async function handler(req, res) {
   const referencia = crypto.randomUUID();
 
   try {
-    // 1. Guardar la solicitud en Supabase.
+    // 1. Guardar el currículum en Supabase.
+    const rutaSupabase = new URL(
+      "/rest/v1/solicitudes_cv",
+      supabaseUrl
+    );
+
     const respuestaGuardado = await fetch(
-      `${supabaseUrl}/rest/v1/solicitudes_cv`,
+      rutaSupabase.toString(),
       {
         method: "POST",
         headers: {
@@ -97,7 +111,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. Preparar el pago en Mercado Pago.
+    // 2. Crear el pago en Mercado Pago.
     const dominio = process.env.VERCEL_URL;
 
     if (!dominio) {
