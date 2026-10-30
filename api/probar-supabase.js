@@ -19,7 +19,6 @@ export default async function handler(req, res) {
     const response = await fetch(
       `${url}/rest/v1/solicitudes_cv?select=id&limit=1`,
       {
-        method: "GET",
         headers: {
           apikey: key,
           Accept: "application/json"
@@ -28,11 +27,21 @@ export default async function handler(req, res) {
     );
 
     if (!response.ok) {
-      console.error("Error de Supabase:", response.status);
+      const body = await response.text();
+
+      console.error("Supabase HTTP:", response.status);
+      console.error("Detalle:", body);
+
+      let codigo = null;
+
+      try {
+        codigo = JSON.parse(body).code ?? null;
+      } catch {}
 
       return res.status(502).json({
         error: "No se pudo conectar con Supabase",
-        codigo_supabase: response.status
+        codigo_supabase: response.status,
+        detalle_codigo: codigo
       });
     }
 
@@ -42,8 +51,6 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Error al conectar con Supabase");
-
     return res.status(500).json({
       error: "Error de conexión"
     });
