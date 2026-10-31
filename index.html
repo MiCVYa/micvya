@@ -163,13 +163,15 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <p>Tu pago fue confirmado. Este es tu CV verdadero.</p>
 <div class="preview" id="realPreview"></div>
 <div class="actions">
-<button class="primary" id="downloadBtn" onclick="downloadCV()">Guardar mi CV en PDF</button>
+<button class="primary" id="downloadBtn" onclick="downloadCV()">Descargar mi CV en PDF</button>
 </div>
-<p class="hint">En la ventana de impresión, elegí «Guardar como PDF» como destino. Conservá el archivo en tu dispositivo.</p>
+<p class="hint" id="downloadMessage">El archivo se genera directamente en tu dispositivo. No necesitás abrir la ventana de impresión.</p>
 </div>
 </main>
 
 <footer>MiCVYa © 2026</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 
 <script>
 let current = 0;
@@ -352,7 +354,7 @@ async function subirFotoPrivada(tokenDescarga,file) {
   }
 }
 
-// Foto ficticia de ejemplo subida a GitHub.
+// Foto ficticia del ejemplo.
 const fotoEjemplo =
   "/foto_ejemplo_juan_perez.png.jpg";
 
@@ -386,16 +388,9 @@ function renderCV(data,selectedDesign,foto = "") {
   const d = {};
 
   const fields = [
-    "nombre",
-    "telefono",
-    "email",
-    "ciudad",
-    "perfil",
-    "experiencia",
-    "educacion",
-    "cursos",
-    "habilidades",
-    "idiomas"
+    "nombre","telefono","email","ciudad",
+    "perfil","experiencia","educacion",
+    "cursos","habilidades","idiomas"
   ];
 
   for (const field of fields) {
@@ -526,9 +521,7 @@ async function testPayment() {
       "/api/crear-pago",
       {
         method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
+        headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
           datos_cv,
           diseno:design
@@ -601,21 +594,15 @@ async function testPayment() {
   }
 }
 
-// Recupera la foto privada mediante un enlace
-// temporal de Supabase. La imagen se procesa
-// dentro del navegador, no en Vercel.
+// Recuperación de la foto privada desde Supabase.
 async function obtenerFotoPagada(tokenDescarga) {
   const response = await fetch(
     "/api/ver-foto",
     {
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
+      headers:{"Content-Type":"application/json"},
       cache:"no-store",
-      body:JSON.stringify({
-        tokenDescarga
-      })
+      body:JSON.stringify({tokenDescarga})
     }
   );
 
@@ -719,11 +706,7 @@ async function obtenerFotoPagada(tokenDescarga) {
   });
 }
 
-// NUEVO: comprobación automática del pago.
-// Máximo: 3 minutos por ciclo.
-// Intervalo: 3 segundos.
-// No se ejecutan consultas simultáneas.
-
+// Comprobación automática del pago.
 const PAYMENT_RETRY_MS = 3000;
 const PAYMENT_MAX_WAIT_MS = 3 * 60 * 1000;
 
@@ -826,13 +809,9 @@ async function checkPaymentOnce(generation) {
       "/api/verificar-cv",
       {
         method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
+        headers:{"Content-Type":"application/json"},
         cache:"no-store",
-        body:JSON.stringify({
-          tokenDescarga:token
-        })
+        body:JSON.stringify({tokenDescarga:token})
       }
     );
 
@@ -906,12 +885,7 @@ async function checkPaymentOnce(generation) {
     );
 
     stopPaymentTimer();
-
     showCard("resultCard");
-
-    // La clave se conserva para permitir
-    // recuperar el CV pagado al volver.
-    // No borramos localStorage.
 
   } catch (error) {
     if (generation !== paymentGeneration) {
@@ -941,21 +915,482 @@ async function checkPaymentOnce(generation) {
   }
 }
 
-// El botón manual reinicia el ciclo
-// de comprobación automática si hace falta.
 function verifyPayment() {
-  if (paymentChecking) {
-    return;
-  }
-
+  if (paymentChecking) return;
   beginAutomaticPaymentCheck();
 }
 
-function downloadCV() {
-  if (!paidCV) {
-    alert(
-      "Primero debemos verificar tu pago."
+// ==================================================
+// GENERADOR DE PDF DIRECTO
+// No abre la ventana de impresión.
+// El texto queda seleccionable.
+// Se adapta a varias páginas A4.
+// ==================================================
+
+function crearDocumentoPDF() {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    throw new Error(
+      "No se pudo cargar el generador de PDF. Revisá tu conexión a Internet e intentá nuevamente."
     );
+  }
+
+  return new window.jspdf.jsPDF({
+    orientation:"portrait",
+    unit:"mm",
+    format:"a4",
+    compress:true
+  });
+}
+
+function nombreArchivoCV(nombre) {
+  const limpio = String(nombre || "Curriculum")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9 ]/g,"")
+    .trim()
+    .replace(/\s+/g,"_")
+    .slice(0,60);
+
+  return "CV_" + (limpio || "Curriculum") + ".pdf";
+}
+
+function crearEscritorPDF(pdf) {
+  const altoPagina = 297;
+  const margenInferior = 16;
+
+  // Cada columna lleva su propia posición.
+  // Esto permite continuar en páginas nuevas.
+  const posiciones = {
+    principal:{pagina:1,y:20},
+    lateral:{pagina:1,y:20},
+    unica:{pagina:1,y:20}
+  };
+
+  function asegurarPagina(numero) {
+    while (pdf.getNumberOfPages() < numero) {
+      pdf.addPage();
+    }
+
+    pdf.setPage(numero);
+  }
+
+  function espacio(columna,altoNecesario) {
+    const estado = posiciones[columna];
+
+    if (
+      estado.y + altoNecesario >
+      altoPagina - margenInferior
+    ) {
+      estado.pagina++;
+      estado.y = 20;
+    }
+
+    asegurarPagina(estado.pagina);
+    return estado;
+  }
+
+  function texto(
+    contenido,
+    columna,
+    x,
+    ancho,
+    opciones = {}
+  ) {
+    const valor = String(contenido ?? "").trim();
+
+    if (!valor) return;
+
+    const tamano = opciones.tamano || 10;
+    const interlineado = opciones.interlineado || 1.45;
+    const estilo = opciones.negrita ? "bold" : "normal";
+    const color = opciones.color || [25,30,42];
+    const alineacion = opciones.alineacion || "left";
+
+    pdf.setFont("helvetica",estilo);
+    pdf.setFontSize(tamano);
+    pdf.setTextColor(...color);
+
+    const bloques = valor.replace(/\r/g,"").split("\n");
+    const alturaLinea = tamano * 0.3528 * interlineado;
+
+    for (const bloque of bloques) {
+      const lineas = pdf.splitTextToSize(
+        bloque || " ",
+        ancho
+      );
+
+      for (const linea of lineas) {
+        const estado = espacio(
+          columna,
+          alturaLinea + 1
+        );
+
+        pdf.setFont("helvetica",estilo);
+        pdf.setFontSize(tamano);
+        pdf.setTextColor(...color);
+
+        pdf.text(
+          linea,
+          alineacion === "center" ? x + ancho / 2 : x,
+          estado.y,
+          {align:alineacion}
+        );
+
+        estado.y += alturaLinea;
+      }
+    }
+
+    posiciones[columna].y += opciones.despues ?? 3;
+  }
+
+  function titulo(
+    contenido,
+    columna,
+    x,
+    ancho,
+    opciones = {}
+  ) {
+    espacio(columna,12);
+
+    texto(
+      contenido,
+      columna,
+      x,
+      ancho,
+      {
+        tamano:opciones.tamano || 13,
+        negrita:true,
+        color:opciones.color || [40,88,167],
+        interlineado:1.2,
+        despues:4
+      }
+    );
+  }
+
+  function separacion(columna,mm) {
+    posiciones[columna].y += mm;
+  }
+
+  function linea(columna,x,ancho) {
+    const estado = espacio(columna,3);
+
+    pdf.setDrawColor(195,200,210);
+    pdf.setLineWidth(0.3);
+    pdf.line(
+      x,
+      estado.y,
+      x + ancho,
+      estado.y
+    );
+
+    estado.y += 5;
+  }
+
+  function seccion(
+    encabezado,
+    contenido,
+    columna,
+    x,
+    ancho,
+    opciones = {}
+  ) {
+    const valor = String(contenido ?? "").trim();
+
+    if (!valor) return;
+
+    titulo(
+      encabezado,
+      columna,
+      x,
+      ancho,
+      opciones
+    );
+
+    texto(
+      valor,
+      columna,
+      x,
+      ancho,
+      {
+        tamano:opciones.textoTamano || 10,
+        despues:7
+      }
+    );
+  }
+
+  return {
+    posiciones,
+    asegurarPagina,
+    espacio,
+    texto,
+    titulo,
+    separacion,
+    linea,
+    seccion
+  };
+}
+
+// Prepara una foto compatible con el PDF.
+// Convierte JPG, PNG o WebP a JPEG mediante canvas.
+async function prepararFotoPDF(dataUrl) {
+  if (!dataUrl) return "";
+
+  const imagen = new Image();
+
+  await new Promise((resolve,reject) => {
+    imagen.onload = resolve;
+    imagen.onerror = () => reject(
+      new Error("No se pudo preparar la foto para el PDF")
+    );
+    imagen.src = dataUrl;
+  });
+
+  if (!imagen.naturalWidth || !imagen.naturalHeight) {
+    throw new Error("La foto no tiene dimensiones válidas");
+  }
+
+  // Recorte centrado, similar a object-fit: cover.
+  const anchoFinal = 480;
+  const altoFinal = 480;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = anchoFinal;
+  canvas.height = altoFinal;
+
+  const contexto = canvas.getContext("2d");
+
+  if (!contexto) {
+    throw new Error("No se pudo procesar la foto");
+  }
+
+  const origenAncho = imagen.naturalWidth;
+  const origenAlto = imagen.naturalHeight;
+
+  const lado = Math.min(origenAncho,origenAlto);
+
+  const sx = (origenAncho - lado) / 2;
+  const sy = Math.max(
+    0,
+    Math.min(
+      origenAlto - lado,
+      (origenAlto - lado) * 0.25
+    )
+  );
+
+  contexto.fillStyle = "#ffffff";
+  contexto.fillRect(0,0,anchoFinal,altoFinal);
+
+  contexto.drawImage(
+    imagen,
+    sx,sy,lado,lado,
+    0,0,anchoFinal,altoFinal
+  );
+
+  return canvas.toDataURL("image/jpeg",0.88);
+}
+
+async function generarPDFModerno(pdf,datos,foto) {
+  const w = crearEscritorPDF(pdf);
+
+  const xPrincipal = 18;
+  const anchoPrincipal = 105;
+  const xLateral = 139;
+  const anchoLateral = 53;
+
+  // Columna principal.
+  w.texto(
+    datos.nombre || "Currículum",
+    "principal",
+    xPrincipal,
+    anchoPrincipal,
+    {
+      tamano:23,
+      negrita:true,
+      color:[30,40,65],
+      interlineado:1.12,
+      despues:12
+    }
+  );
+
+  w.seccion(
+    "Resumen Profesional",
+    datos.perfil,
+    "principal",
+    xPrincipal,
+    anchoPrincipal
+  );
+
+  w.seccion(
+    "Experiencia Laboral",
+    datos.experiencia,
+    "principal",
+    xPrincipal,
+    anchoPrincipal
+  );
+
+  w.seccion(
+    "Cursos y capacitaciones",
+    datos.cursos,
+    "principal",
+    xPrincipal,
+    anchoPrincipal
+  );
+
+  w.seccion(
+    "Idiomas",
+    datos.idiomas,
+    "principal",
+    xPrincipal,
+    anchoPrincipal
+  );
+
+  // Columna lateral con foto opcional.
+  if (foto) {
+    const fotoJPEG = await prepararFotoPDF(foto);
+
+    const estado = w.espacio("lateral",53);
+
+    pdf.addImage(
+      fotoJPEG,
+      "JPEG",
+      xLateral,
+      estado.y,
+      anchoLateral,
+      49
+    );
+
+    estado.y += 57;
+  }
+
+  w.titulo(
+    "Contacto",
+    "lateral",
+    xLateral,
+    anchoLateral,
+    {tamano:12}
+  );
+
+  for (const campo of [
+    datos.telefono,
+    datos.email,
+    datos.ciudad
+  ]) {
+    if (campo) {
+      w.texto(
+        campo,
+        "lateral",
+        xLateral,
+        anchoLateral,
+        {
+          tamano:9,
+          despues:4
+        }
+      );
+
+      w.linea(
+        "lateral",
+        xLateral,
+        anchoLateral
+      );
+    }
+  }
+
+  w.seccion(
+    "Formación",
+    datos.educacion,
+    "lateral",
+    xLateral,
+    anchoLateral,
+    {
+      tamano:12,
+      textoTamano:9
+    }
+  );
+
+  w.seccion(
+    "Competencias",
+    datos.habilidades,
+    "lateral",
+    xLateral,
+    anchoLateral,
+    {
+      tamano:12,
+      textoTamano:9
+    }
+  );
+}
+
+function generarPDFATS(pdf,datos) {
+  const w = crearEscritorPDF(pdf);
+
+  const x = 20;
+  const ancho = 170;
+
+  w.texto(
+    String(datos.nombre || "Currículum").toUpperCase(),
+    "unica",
+    x,
+    ancho,
+    {
+      tamano:19,
+      negrita:true,
+      alineacion:"center",
+      despues:5
+    }
+  );
+
+  const contacto = [
+    datos.telefono,
+    datos.email,
+    datos.ciudad
+  ].filter(Boolean).join(" · ");
+
+  w.texto(
+    contacto,
+    "unica",
+    x,
+    ancho,
+    {
+      tamano:9,
+      alineacion:"center",
+      despues:5
+    }
+  );
+
+  w.linea("unica",x,ancho);
+
+  const secciones = [
+    ["PERFIL PROFESIONAL",datos.perfil],
+    ["EDUCACIÓN",datos.educacion],
+    ["EXPERIENCIA PROFESIONAL",datos.experiencia],
+    ["HABILIDADES",datos.habilidades],
+    ["CERTIFICACIONES Y CURSOS",datos.cursos],
+    ["IDIOMAS",datos.idiomas]
+  ];
+
+  for (const [titulo,contenido] of secciones) {
+    w.seccion(
+      titulo,
+      contenido,
+      "unica",
+      x,
+      ancho,
+      {
+        tamano:11,
+        textoTamano:10,
+        color:[20,20,20]
+      }
+    );
+  }
+}
+
+let pdfDownloading = false;
+
+async function downloadCV() {
+  if (pdfDownloading) return;
+
+  if (!paidCV) {
+    alert("Primero debemos verificar tu pago.");
     return;
   }
 
@@ -965,163 +1400,67 @@ function downloadCV() {
     !paidPhoto
   ) {
     alert(
-      "Todavía no pudimos recuperar tu foto. Volvé a comprobar el pago antes de guardar el PDF."
+      "Todavía no pudimos recuperar tu foto. Esperá a que termine la comprobación del pago."
     );
     return;
   }
 
-  const printWindow = window.open(
-    "",
-    "_blank"
-  );
+  const boton = el("downloadBtn");
+  const mensaje = el("downloadMessage");
 
-  if (!printWindow) {
-    alert(
-      "Permití las ventanas emergentes para guardar tu CV."
-    );
-    return;
-  }
+  pdfDownloading = true;
+  boton.disabled = true;
+  boton.textContent = "Generando PDF...";
+  mensaje.textContent =
+    "Preparando el archivo en tu dispositivo...";
 
-  const content = renderCV(
-    paidCV.datos_cv,
-    paidCV.diseno,
-    paidPhoto
-  );
+  try {
+    const pdf = crearDocumentoPDF();
 
-  printWindow.document.open();
+    const datos = paidCV.datos_cv;
 
-  printWindow.document.write(`
-    <!doctype html>
-    <html lang="es">
-    <head>
-      <meta charset="utf-8">
-      <title>Mi currículum - MiCVYa</title>
-      <style>
-        *{box-sizing:border-box}
-        @page{size:A4;margin:12mm}
-        body{
-          margin:0;
-          color:#111;
-          font-family:Arial,sans-serif
-        }
-        .cv{
-          width:100%;
-          font-family:Arial,sans-serif;
-          line-height:1.4;
-          overflow-wrap:anywhere
-        }
-        .cv section{
-          margin:0 0 15px;
-          break-inside:avoid
-        }
-        .cv p{
-          font-size:10pt;
-          line-height:1.5;
-          white-space:pre-wrap;
-          margin:0;
-          color:#111
-        }
-        .cv.modern{
-          display:grid;
-          grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);
-          gap:20px
-        }
-        .cv.modern h2{
-          font-family:Georgia,serif;
-          font-size:28pt;
-          margin:0 0 25px
-        }
-        .cv.modern h3{
-          font-family:Georgia,serif;
-          font-size:13pt;
-          color:#2858a7;
-          margin:0 0 8px
-        }
-        .cv.modern .sidebox{
-          border:1px solid #bbb;
-          padding:15px;
-          margin-bottom:15px;
-          break-inside:avoid
-        }
-        .cv.modern .sidebox p{
-          border-bottom:1px solid #ddd;
-          padding:6px 0
-        }
-        .cv.modern .timeline{
-          border-left:2px solid #ddd;
-          padding-left:12px
-        }
-        .cv-photo{
-          width:100%;
-          height:160px;
-          object-fit:cover;
-          object-position:center 25%;
-          display:block;
-          margin:0 0 15px;
-          border-radius:5px
-        }
-        .cv.ats .head{
-          text-align:center;
-          border-bottom:1px solid #bbb;
-          padding-bottom:15px;
-          margin-bottom:20px
-        }
-        .cv.ats h2{
-          font-size:19pt;
-          text-transform:uppercase;
-          margin:0 0 5px
-        }
-        .cv.ats .contact{
-          font-size:9pt
-        }
-        .cv.ats h3{
-          font-size:11pt;
-          text-transform:uppercase;
-          margin:0 0 8px
-        }
-        .cv.ats p{
-          font-size:10pt
-        }
-      </style>
-    </head>
-    <body>${content}</body>
-    </html>
-  `);
-
-  printWindow.document.close();
-
-  const imagen = printWindow.document.querySelector(
-    ".cv-photo"
-  );
-
-  const imprimir = () => {
-    printWindow.focus();
-    printWindow.print();
-  };
-
-  if (imagen) {
-    if (imagen.complete) {
-      if (imagen.naturalWidth > 0) {
-        imprimir();
-      } else {
-        alert(
-          "No se pudo cargar la foto para imprimir."
-        );
-      }
+    if (paidCV.diseno === "modern") {
+      await generarPDFModerno(
+        pdf,
+        datos,
+        paidPhoto
+      );
     } else {
-      imagen.onload = imprimir;
-
-      imagen.onerror = () => {
-        alert(
-          "No se pudo cargar la foto para imprimir."
-        );
-      };
+      generarPDFATS(pdf,datos);
     }
-  } else {
-    imprimir();
+
+    const nombre = nombreArchivoCV(datos.nombre);
+
+    // Descarga directa. No llama a window.print().
+    pdf.save(nombre);
+
+    mensaje.textContent =
+      "El PDF fue generado. Revisá las descargas de tu navegador. En algunos celulares puede aparecer la opción de guardar o compartir el archivo.";
+
+  } catch (error) {
+    console.error(
+      "Error al generar el PDF:",
+      error
+    );
+
+    mensaje.textContent =
+      "No pudimos generar el PDF. Podés volver a intentarlo sin pagar otra vez.";
+
+    alert(
+      "No se pudo generar el PDF: " +
+      error.message
+    );
+
+  } finally {
+    pdfDownloading = false;
+    boton.disabled = false;
+    boton.textContent =
+      "Descargar mi CV en PDF";
   }
 }
 
+// Al volver desde Mercado Pago, el sistema
+// comprueba automáticamente el pago.
 window.addEventListener(
   "DOMContentLoaded",
   () => {
@@ -1150,9 +1489,6 @@ window.addEventListener(
   }
 );
 
-// Si el cliente vuelve a la pestaña después
-// de un tiempo, retomamos la comprobación
-// siempre que todavía no esté viendo su CV.
 document.addEventListener(
   "visibilitychange",
   () => {
