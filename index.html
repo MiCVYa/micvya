@@ -150,12 +150,12 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 </div>
 
 <div class="card" id="paymentCard" hidden>
-<h2>Estamos comprobando tu pago</h2>
-<p id="paymentMessage">Consultando el estado de tu currículum...</p>
+<h2>Estamos preparando tu currículum</h2>
+<p id="paymentMessage" role="status" aria-live="polite">Comprobando el pago automáticamente...</p>
 <div class="actions">
-<button class="primary" id="verifyBtn" onclick="verifyPayment()">Volver a comprobar</button>
+<button class="secondary" id="verifyBtn" onclick="verifyPayment()">Comprobar ahora</button>
 </div>
-<p class="hint">No necesitás pagar otra vez. La confirmación puede tardar unos momentos.</p>
+<p class="hint">Si ya pagaste, no vuelvas a pagar. La página comprobará el pago automáticamente durante unos minutos.</p>
 </div>
 
 <div class="card" id="resultCard" hidden>
@@ -230,14 +230,17 @@ function move(direction) {
 
 function choose(selected) {
   design = selected;
+
   el("modernBtn").classList.toggle(
     "selected",
     selected === "modern"
   );
+
   el("atsBtn").classList.toggle(
     "selected",
     selected === "ats"
   );
+
   el("photoFields").hidden = selected === "ats";
 }
 
@@ -598,9 +601,9 @@ async function testPayment() {
   }
 }
 
-// Recupera la foto privada usando un enlace
-// temporal de Supabase, sin pasar la imagen
-// completa por la función de Vercel.
+// Recupera la foto privada mediante un enlace
+// temporal de Supabase. La imagen se procesa
+// dentro del navegador, no en Vercel.
 async function obtenerFotoPagada(tokenDescarga) {
   const response = await fetch(
     "/api/ver-foto",
@@ -652,8 +655,6 @@ async function obtenerFotoPagada(tokenDescarga) {
     );
   }
 
-  // La descarga ocurre directamente desde
-  // Supabase al navegador del cliente.
   const respuestaFoto = await fetch(url.href,{
     method:"GET",
     cache:"no-store"
@@ -687,9 +688,6 @@ async function obtenerFotoPagada(tokenDescarga) {
     );
   }
 
-  // Convertimos la imagen dentro del navegador.
-  // Esto permite imprimirla incluso después de
-  // que venza el enlace temporal de Supabase.
   return await new Promise((resolve,reject) => {
     const lector = new FileReader();
 
@@ -721,7 +719,51 @@ async function obtenerFotoPagada(tokenDescarga) {
   });
 }
 
-async function verifyPayment() {
+// NUEVO: comprobación automática del pago.
+// Máximo: 3 minutos por ciclo.
+// Intervalo: 3 segundos.
+// No se ejecutan consultas simultáneas.
+
+const PAYMENT_RETRY_MS = 3000;
+const PAYMENT_MAX_WAIT_MS = 3 * 60 * 1000;
+
+let paymentTimer = null;
+let paymentChecking = false;
+let paymentStartedAt = 0;
+let paymentGeneration = 0;
+
+function stopPaymentTimer() {
+  if (paymentTimer !== null) {
+    clearTimeout(paymentTimer);
+    paymentTimer = null;
+  }
+}
+
+function schedulePaymentRetry(generation) {
+  stopPaymentTimer();
+
+  if (generation !== paymentGeneration) {
+    return;
+  }
+
+  const elapsed = Date.now() - paymentStartedAt;
+
+  if (elapsed >= PAYMENT_MAX_WAIT_MS) {
+    el("paymentMessage").textContent =
+      "La comprobación automática está tardando más de lo esperado. Si ya pagaste, no vuelvas a pagar. Podés tocar «Comprobar ahora» para volver a intentarlo.";
+
+    el("verifyBtn").hidden = false;
+    el("verifyBtn").disabled = false;
+    return;
+  }
+
+  paymentTimer = setTimeout(() => {
+    paymentTimer = null;
+    checkPaymentOnce(generation);
+  }, PAYMENT_RETRY_MS);
+}
+
+function beginAutomaticPaymentCheck() {
   const token = localStorage.getItem(
     "micvya_token_descarga"
   );
@@ -736,12 +778,48 @@ async function verifyPayment() {
     return;
   }
 
+  paymentGeneration++;
+  paymentStartedAt = Date.now();
+
+  stopPaymentTimer();
+
   el("verifyBtn").hidden = false;
+  el("verifyBtn").disabled = false;
+
   showCard("paymentCard");
-  el("verifyBtn").disabled = true;
 
   el("paymentMessage").textContent =
-    "Consultando el estado del pago...";
+    "Estamos preparando tu CV. Comprobaremos el pago automáticamente...";
+
+  checkPaymentOnce(paymentGeneration);
+}
+
+async function checkPaymentOnce(generation) {
+  if (
+    paymentChecking ||
+    generation !== paymentGeneration
+  ) {
+    return;
+  }
+
+  const token = localStorage.getItem(
+    "micvya_token_descarga"
+  );
+
+  if (!token) {
+    stopPaymentTimer();
+
+    el("paymentMessage").textContent =
+      "No encontramos tu clave de recuperación. No vuelvas a pagar.";
+
+    el("verifyBtn").hidden = true;
+    return;
+  }
+
+  paymentChecking = true;
+  el("verifyBtn").disabled = true;
+
+  let shouldRetry = false;
 
   try {
     const response = await fetch(
@@ -760,6 +838,10 @@ async function verifyPayment() {
 
     const data = await response.json();
 
+    if (generation !== paymentGeneration) {
+      return;
+    }
+
     if (!response.ok) {
       throw new Error(
         data.error || "No se pudo verificar el pago"
@@ -768,7 +850,9 @@ async function verifyPayment() {
 
     if (!data.aprobado) {
       el("paymentMessage").textContent =
-        "Tu currículum todavía figura pendiente. Si ya pagaste, esperá unos momentos y volvé a comprobar.";
+        "Estamos esperando la confirmación de Mercado Pago. No necesitás hacer nada, seguiremos comprobando automáticamente.";
+
+      shouldRetry = true;
       return;
     }
 
@@ -793,7 +877,7 @@ async function verifyPayment() {
       paidCV.datos_cv.foto_path
     ) {
       el("paymentMessage").textContent =
-        "Pago confirmado. Recuperando tu foto...";
+        "¡Pago aprobado! Estamos cargando tu foto...";
 
       try {
         paidPhoto = await obtenerFotoPagada(token);
@@ -804,12 +888,15 @@ async function verifyPayment() {
         );
 
         el("paymentMessage").textContent =
-          "Tu pago está aprobado, pero no pudimos cargar la foto: " +
-          errorFoto.message +
-          ". Volvé a comprobar para intentar recuperarla.";
+          "Tu pago está aprobado. Estamos intentando recuperar tu foto automáticamente...";
 
+        shouldRetry = true;
         return;
       }
+    }
+
+    if (generation !== paymentGeneration) {
+      return;
     }
 
     el("realPreview").innerHTML = renderCV(
@@ -818,15 +905,50 @@ async function verifyPayment() {
       paidPhoto
     );
 
+    stopPaymentTimer();
+
     showCard("resultCard");
 
+    // La clave se conserva para permitir
+    // recuperar el CV pagado al volver.
+    // No borramos localStorage.
+
   } catch (error) {
+    if (generation !== paymentGeneration) {
+      return;
+    }
+
+    console.error(
+      "Error al comprobar el pago:",
+      error
+    );
+
     el("paymentMessage").textContent =
-      "No pudimos comprobar tu pago: " +
-      error.message;
+      "Estamos teniendo una demora al comprobar tu CV. Vamos a intentarlo nuevamente. No vuelvas a pagar.";
+
+    shouldRetry = true;
+
   } finally {
+    paymentChecking = false;
     el("verifyBtn").disabled = false;
+
+    if (
+      shouldRetry &&
+      generation === paymentGeneration
+    ) {
+      schedulePaymentRetry(generation);
+    }
   }
+}
+
+// El botón manual reinicia el ciclo
+// de comprobación automática si hace falta.
+function verifyPayment() {
+  if (paymentChecking) {
+    return;
+  }
+
+  beginAutomaticPaymentCheck();
 }
 
 function downloadCV() {
@@ -1003,19 +1125,20 @@ function downloadCV() {
 window.addEventListener(
   "DOMContentLoaded",
   () => {
-    if (
-      localStorage.getItem(
-        "micvya_token_descarga"
-      )
-    ) {
-      verifyPayment();
+    const token = localStorage.getItem(
+      "micvya_token_descarga"
+    );
+
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    if (token) {
+      beginAutomaticPaymentCheck();
     } else if (
-      new URLSearchParams(
-        window.location.search
-      ).has("collection_id") ||
-      new URLSearchParams(
-        window.location.search
-      ).has("status")
+      params.has("collection_id") ||
+      params.has("status") ||
+      params.has("payment_id")
     ) {
       showCard("paymentCard");
 
@@ -1023,6 +1146,24 @@ window.addEventListener(
         "Volviste de Mercado Pago, pero no encontramos tu clave en este navegador. No pagues otra vez. Estamos preparando la recuperación por correo electrónico.";
 
       el("verifyBtn").hidden = true;
+    }
+  }
+);
+
+// Si el cliente vuelve a la pestaña después
+// de un tiempo, retomamos la comprobación
+// siempre que todavía no esté viendo su CV.
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (
+      !document.hidden &&
+      !el("paymentCard").hidden &&
+      !paymentChecking &&
+      paymentTimer === null &&
+      localStorage.getItem("micvya_token_descarga")
+    ) {
+      beginAutomaticPaymentCheck();
     }
   }
 );
