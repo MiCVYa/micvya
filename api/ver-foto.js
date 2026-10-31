@@ -124,7 +124,9 @@ export default async function handler(req, res) {
       return responder(res, 400, "Ruta de foto inválida");
     }
 
-    const tipo = FORMATOS[coincidencia[1].toLowerCase()];
+    const tipo = FORMATOS[
+      coincidencia[1].toLowerCase()
+    ];
 
     const rutaArchivo = path
       .split("/")
@@ -157,7 +159,8 @@ export default async function handler(req, res) {
 
     const resultado = await firma.json();
 
-    const enlace = resultado.signedURL ||
+    const enlace =
+      resultado.signedURL ||
       resultado.signedUrl;
 
     if (typeof enlace !== "string" || !enlace) {
@@ -166,19 +169,51 @@ export default async function handler(req, res) {
       );
     }
 
-    const fotoUrl = new URL(enlace, supabaseUrl);
+    // Supabase puede devolver:
+    // /object/sign/...
+    // o /storage/v1/object/sign/...
+    // Normalizamos ambos formatos.
+
     const origenSupabase = new URL(supabaseUrl);
 
-    if (
-      fotoUrl.origin !== origenSupabase.origin ||
-      !fotoUrl.pathname.startsWith(
-        `/storage/v1/object/sign/${BUCKET}/`
-      )
-    ) {
+    const enlaceRecibido = new URL(
+      enlace,
+      supabaseUrl
+    );
+
+    if (enlaceRecibido.origin !== origenSupabase.origin) {
       throw new Error(
-        "El enlace temporal no es válido"
+        "El enlace pertenece a un servidor desconocido"
       );
     }
+
+    let pathname = enlaceRecibido.pathname;
+
+    if (pathname.startsWith("/object/sign/")) {
+      pathname = "/storage/v1" + pathname;
+    }
+
+    const rutaEsperada =
+      `/storage/v1/object/sign/${BUCKET}/${rutaArchivo}`;
+
+    if (pathname !== rutaEsperada) {
+      throw new Error(
+        "La ruta del enlace temporal no es válida"
+      );
+    }
+
+    if (!enlaceRecibido.searchParams.has("token")) {
+      throw new Error(
+        "El enlace temporal no contiene autorización"
+      );
+    }
+
+    const fotoUrl = new URL(
+      pathname,
+      supabaseUrl
+    );
+
+    fotoUrl.search = enlaceRecibido.search;
 
     return res.status(200).json({
       ok: true,
@@ -188,7 +223,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Error al consultar la foto:", error);
+    console.error(
+      "Error al consultar la foto:",
+      error
+    );
 
     return responder(
       res,
