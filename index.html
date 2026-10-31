@@ -2092,19 +2092,21 @@ async function generarPDFModerno(pdf, datos, foto) {
         contacto &&
         indice < bloques.length - 1
       ) {
-        y += 1.5;
+        // Separador alineado debajo del dato actual.
+        // Conserva la distancia entre las filas.
+        const ySeparador = y - altoLinea + 2.5;
 
         pdf.setDrawColor(215, 215, 215);
         pdf.setLineWidth(0.22);
 
         pdf.line(
           sideX + padding,
-          y,
+          ySeparador,
           sideX + sideW - padding,
-          y
+          ySeparador
         );
 
-        y += 3.5;
+        y += 5;
       } else {
         y += 5;
       }
