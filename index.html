@@ -140,7 +140,7 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <p>Este es un ejemplo del diseño que elegiste.</p>
 <div class="example-notice">
 <strong>Vista de ejemplo</strong>
-<p>Los datos de Juan Pérez y la imagen ilustrativa son ficticios. Tu currículum verdadero llevará tus datos y, si elegiste el diseño moderno con foto, la imagen que subiste.</p>
+<p>Los datos de Juan Pérez y su foto son ficticios. Tu currículum verdadero llevará tus datos y, si elegiste el diseño moderno con foto, la imagen que subiste.</p>
 </div>
 <div class="preview" id="preview"></div>
 <div class="actions">
@@ -252,13 +252,13 @@ function photoChanged(event) {
 
 async function subirFotoPrivada(tokenDescarga, file) {
   const autorizacion = await fetch("/api/subir-foto", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    cache: "no-store",
-    body: JSON.stringify({
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    cache:"no-store",
+    body:JSON.stringify({
       tokenDescarga,
-      tipo: file.type,
-      tamano: file.size
+      tipo:file.type,
+      tamano:file.size
     })
   });
 
@@ -293,25 +293,25 @@ async function subirFotoPrivada(tokenDescarga, file) {
     base
   );
 
-  urlSubida.searchParams.set("token", permiso.token);
+  urlSubida.searchParams.set("token",permiso.token);
 
-  const subida = await fetch(urlSubida, {
-    method: "PUT",
-    headers: {"Content-Type": file.type},
-    body: file
+  const subida = await fetch(urlSubida,{
+    method:"PUT",
+    headers:{"Content-Type":file.type},
+    body:file
   });
 
   if (!subida.ok) {
     throw new Error("No se pudo subir la foto a Supabase");
   }
 
-  const confirmacion = await fetch("/api/confirmar-foto", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    cache: "no-store",
-    body: JSON.stringify({
+  const confirmacion = await fetch("/api/confirmar-foto",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    cache:"no-store",
+    body:JSON.stringify({
       tokenDescarga,
-      path: permiso.path
+      path:permiso.path
     })
   });
 
@@ -322,24 +322,9 @@ async function subirFotoPrivada(tokenDescarga, file) {
   }
 }
 
-// Retrato ilustrativo ficticio para el ejemplo.
-// No utiliza fotos privadas de clientes.
-const fotoEjemploSVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="350" viewBox="0 0 300 350">
-  <rect width="300" height="350" fill="#e5e7eb"/>
-  <circle cx="150" cy="125" r="62" fill="#d5a27f"/>
-  <path d="M88 112 Q90 35 151 42 Q217 40 213 116 Q185 83 150 88 Q115 82 88 112" fill="#30333d"/>
-  <ellipse cx="126" cy="130" rx="5" ry="4" fill="#37302d"/>
-  <ellipse cx="174" cy="130" rx="5" ry="4" fill="#37302d"/>
-  <path d="M139 160 Q150 168 162 160" fill="none" stroke="#855a48" stroke-width="3" stroke-linecap="round"/>
-  <path d="M55 350 Q62 228 150 226 Q238 228 245 350" fill="#263b5c"/>
-  <path d="M115 235 L150 285 L185 235" fill="#ffffff"/>
-  <path d="M145 277 L150 292 L155 277 L166 350 L134 350 Z" fill="#345b92"/>
-</svg>`;
-
-const fotoEjemplo =
-  "data:image/svg+xml;charset=utf-8," +
-  encodeURIComponent(fotoEjemploSVG);
+// Foto realista ficticia de Juan Pérez.
+// Este archivo está en la carpeta principal del proyecto.
+const fotoEjemplo = "/foto_ejemplo_juan_perez.png";
 
 const ejemplo = {
   nombre:"Juan Pérez",
@@ -355,7 +340,7 @@ const ejemplo = {
 };
 
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
+  return String(value ?? "").replace(/[&<>"']/g,char => ({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
@@ -364,9 +349,8 @@ function escapeHTML(value) {
   })[char]);
 }
 
-function renderCV(data, selectedDesign, foto = "") {
+function renderCV(data,selectedDesign,foto = "") {
   const d = {};
-
   const fields = [
     "nombre","telefono","email","ciudad","perfil",
     "experiencia","educacion","cursos","habilidades","idiomas"
@@ -476,7 +460,7 @@ async function testPayment() {
       idiomas:val("idiomas")
     };
 
-    const response = await fetch("/api/crear-pago", {
+    const response = await fetch("/api/crear-pago",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({datos_cv,diseno:design})
@@ -515,7 +499,7 @@ async function testPayment() {
 
     if (design === "modern" && photoFile) {
       button.textContent = "Guardando tu foto...";
-      await subirFotoPrivada(data.tokenDescarga, photoFile);
+      await subirFotoPrivada(data.tokenDescarga,photoFile);
     }
 
     window.location.assign(url.href);
@@ -533,7 +517,7 @@ async function testPayment() {
 }
 
 async function obtenerFotoPagada(tokenDescarga) {
-  const response = await fetch("/api/ver-foto", {
+  const response = await fetch("/api/ver-foto",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     cache:"no-store",
@@ -574,7 +558,7 @@ async function verifyPayment() {
     "Consultando el estado del pago...";
 
   try {
-    const response = await fetch("/api/verificar-cv", {
+    const response = await fetch("/api/verificar-cv",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       cache:"no-store",
@@ -617,7 +601,7 @@ async function verifyPayment() {
       try {
         paidPhoto = await obtenerFotoPagada(token);
       } catch (errorFoto) {
-        console.error("No se pudo cargar la foto:", errorFoto);
+        console.error("No se pudo cargar la foto:",errorFoto);
         el("paymentMessage").textContent =
           "Tu pago está aprobado, pero no pudimos cargar la foto. Volvé a comprobar para intentar recuperarla.";
         return;
@@ -708,7 +692,7 @@ function downloadCV() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded",() => {
   if (localStorage.getItem("micvya_token_descarga")) {
     verifyPayment();
   } else if (
