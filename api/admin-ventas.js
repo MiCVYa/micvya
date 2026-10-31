@@ -194,8 +194,19 @@ export default async function handler(req, res) {
       );
 
       if (!respuestaLogin.ok) {
+        const detalle = await respuestaLogin.text();
+
+        // Diagnóstico temporal.
+        // No registrar contraseñas ni tokens.
+        console.error(
+          "Error de autenticación Supabase:",
+          respuestaLogin.status,
+          detalle
+        );
+
         return res.status(401).json({
-          error: "Correo o contraseña incorrectos"
+          error:
+            "No se pudo iniciar sesión. Revisá el registro del servidor."
         });
       }
 
