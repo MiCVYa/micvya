@@ -171,7 +171,8 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 
 <footer>MiCVYa © 2026</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<!-- CORRECCIÓN: versión disponible de jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 let current = 0;
@@ -354,7 +355,6 @@ async function subirFotoPrivada(tokenDescarga,file) {
   }
 }
 
-// Foto ficticia del ejemplo.
 const fotoEjemplo =
   "/foto_ejemplo_juan_perez.png.jpg";
 
@@ -594,7 +594,6 @@ async function testPayment() {
   }
 }
 
-// Recuperación de la foto privada desde Supabase.
 async function obtenerFotoPagada(tokenDescarga) {
   const response = await fetch(
     "/api/ver-foto",
@@ -706,7 +705,6 @@ async function obtenerFotoPagada(tokenDescarga) {
   });
 }
 
-// Comprobación automática del pago.
 const PAYMENT_RETRY_MS = 3000;
 const PAYMENT_MAX_WAIT_MS = 3 * 60 * 1000;
 
@@ -920,12 +918,7 @@ function verifyPayment() {
   beginAutomaticPaymentCheck();
 }
 
-// ==================================================
 // GENERADOR DE PDF DIRECTO
-// No abre la ventana de impresión.
-// El texto queda seleccionable.
-// Se adapta a varias páginas A4.
-// ==================================================
 
 function crearDocumentoPDF() {
   if (!window.jspdf || !window.jspdf.jsPDF) {
@@ -958,8 +951,6 @@ function crearEscritorPDF(pdf) {
   const altoPagina = 297;
   const margenInferior = 16;
 
-  // Cada columna lleva su propia posición.
-  // Esto permite continuar en páginas nuevas.
   const posiciones = {
     principal:{pagina:1,y:20},
     lateral:{pagina:1,y:20},
@@ -1130,8 +1121,6 @@ function crearEscritorPDF(pdf) {
   };
 }
 
-// Prepara una foto compatible con el PDF.
-// Convierte JPG, PNG o WebP a JPEG mediante canvas.
 async function prepararFotoPDF(dataUrl) {
   if (!dataUrl) return "";
 
@@ -1149,7 +1138,6 @@ async function prepararFotoPDF(dataUrl) {
     throw new Error("La foto no tiene dimensiones válidas");
   }
 
-  // Recorte centrado, similar a object-fit: cover.
   const anchoFinal = 480;
   const altoFinal = 480;
 
@@ -1197,7 +1185,6 @@ async function generarPDFModerno(pdf,datos,foto) {
   const xLateral = 139;
   const anchoLateral = 53;
 
-  // Columna principal.
   w.texto(
     datos.nombre || "Currículum",
     "principal",
@@ -1244,7 +1231,6 @@ async function generarPDFModerno(pdf,datos,foto) {
     anchoPrincipal
   );
 
-  // Columna lateral con foto opcional.
   if (foto) {
     const fotoJPEG = await prepararFotoPDF(foto);
 
@@ -1416,7 +1402,6 @@ async function downloadCV() {
 
   try {
     const pdf = crearDocumentoPDF();
-
     const datos = paidCV.datos_cv;
 
     if (paidCV.diseno === "modern") {
@@ -1431,7 +1416,6 @@ async function downloadCV() {
 
     const nombre = nombreArchivoCV(datos.nombre);
 
-    // Descarga directa. No llama a window.print().
     pdf.save(nombre);
 
     mensaje.textContent =
@@ -1459,8 +1443,6 @@ async function downloadCV() {
   }
 }
 
-// Al volver desde Mercado Pago, el sistema
-// comprueba automáticamente el pago.
 window.addEventListener(
   "DOMContentLoaded",
   () => {
