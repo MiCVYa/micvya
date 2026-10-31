@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Recuperar contraseña | MiCVYa</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #17233b;
+    }
+    header {
+      background: #17233b;
+      color: white;
+      padding: 22px;
+      font-size: 23px;
+      font-weight: bold;
+    }
+    main {
+      max-width: 440px;
+      margin: 65px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 28px;
+      box-shadow: 0 5px 20px #17233b12;
+    }
+    h1 { font-size: 25px; margin-top: 0; }
+    p { color: #68758a; line-height: 1.6; }
+    label {
+      display: block;
+      margin: 18px 0 7px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #cbd3e0;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      background: #2457e7;
+      color: white;
+      border: none;
+      border-radius: 9px;
+      padding: 14px;
+      margin-top: 22px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .6; }
+    .hidden { display: none; }
+    .mensaje { margin-top: 18px; font-size: 14px; }
+    a { color: #2457e7; }
+  </style>
+</head>
+<body>
+  <header>MiCVYa | Seguridad</header>
+
+  <main>
+    <div class="card">
+      <h1>Restablecer contraseña</h1>
+
+      <p id="estado">
+        Comprobando el enlace de recuperación...
+      </p>
+
+      <form id="formulario" class="hidden">
+        <label for="password">Nueva contraseña</label>
+        <input
+          id="password"
+          type="password"
+          minlength="12"
+          autocomplete="new-password"
+          required
+        >
+
+        <label for="confirmar">Repetir contraseña</label>
+        <input
+          id="confirmar"
+          type="password"
+          minlength="12"
+          autocomplete="new-password"
+          required
+        >
+
+        <button id="guardar" type="submit">
+          Guardar nueva contraseña
+        </button>
+      </form>
+
+      <p id="mensaje" class="mensaje" role="status"></p>
+
+      <p>
+        <a href="/admin">Volver al administrador</a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const estado = document.getElementById("estado");
+    const mensaje = document.getElementById("mensaje");
+    const guardar = document.getElementById("guardar");
+
+    let accessToken = null;
+
+    function leerParametros(texto) {
+      return new URLSearchParams(texto.replace(/^#/, ""));
+    }
+
+    function obtenerSesion() {
+      const hash = leerParametros(location.hash);
+      const query = new URLSearchParams(location.search);
+
+      // Supabase puede enviar tokens en el fragmento
+      // o un token_hash para verificación.
+      const token = hash.get("access_token");
+
+      if (token && hash.get("type") === "recovery") {
+        accessToken = token;
+        history.replaceState(null, "", location.pathname);
+        estado.textContent = "Ingresá tu nueva contraseña.";
+        formulario.classList.remove("hidden");
+        return;
+      }
+
+      const error =
+        hash.get("error_description") ||
+        query.get("error_description");
+
+      if (error) {
+        estado.textContent =
+          "El enlace no es válido o venció. Solicitá uno nuevo.";
+        return;
+      }
+
+      estado.textContent =
+        "No se encontró una sesión de recuperación válida. " +
+        "Solicitá un enlace nuevo desde Supabase.";
+    }
+
+    formulario.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const password =
+        document.getElementById("password").value;
+
+      const confirmar =
+        document.getElementById("confirmar").value;
+
+      if (password !== confirmar) {
+        mensaje.textContent = "Las contraseñas no coinciden.";
+        return;
+      }
+
+      if (!accessToken) {
+        mensaje.textContent = "El enlace de recuperación no es válido.";
+        return;
+      }
+
+      guardar.disabled = true;
+      mensaje.textContent = "Guardando contraseña...";
+
+      try {
+        const respuesta = await fetch(
+          "/api/admin-recuperar",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              access_token: accessToken,
+              password
+            })
+          }
+        );
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+          throw new Error(
+            datos.error || "No se pudo cambiar la contraseña"
+          );
+        }
+
+        accessToken = null;
+        formulario.reset();
+        formulario.classList.add("hidden");
+        estado.textContent = "Contraseña actualizada.";
+        mensaje.textContent =
+          "Ya podés ingresar al panel de administrador.";
+
+      } catch (error) {
+        mensaje.textContent = error.message;
+      } finally {
+        guardar.disabled = false;
+      }
+    });
+
+    obtenerSesion();
+  </script>
+</body>
+</html>
