@@ -250,8 +250,8 @@ function photoChanged(event) {
   photoFile = file;
 }
 
-async function subirFotoPrivada(tokenDescarga, file) {
-  const autorizacion = await fetch("/api/subir-foto", {
+async function subirFotoPrivada(tokenDescarga,file) {
+  const autorizacion = await fetch("/api/subir-foto",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     cache:"no-store",
@@ -322,9 +322,8 @@ async function subirFotoPrivada(tokenDescarga, file) {
   }
 }
 
-// Foto realista ficticia de Juan Pérez.
-// Este archivo está en la carpeta principal del proyecto.
-const fotoEjemplo = "/foto_ejemplo_juan_perez.png";
+// Nombre exacto del archivo que subiste a GitHub.
+const fotoEjemplo = "/foto_ejemplo_juan_perez.png.jpg";
 
 const ejemplo = {
   nombre:"Juan Pérez",
