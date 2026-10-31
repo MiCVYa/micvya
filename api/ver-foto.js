@@ -16,6 +16,21 @@ function responder(res, codigo, mensaje) {
   });
 }
 
+// Compatible con claves nuevas sb_secret_
+// y con claves antiguas service_role.
+function credencialesSupabase(key, extras = {}) {
+  const headers = {
+    apikey: key,
+    ...extras
+  };
+
+  if (!key.startsWith("sb_")) {
+    headers.Authorization = `Bearer ${key}`;
+  }
+
+  return headers;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -33,7 +48,11 @@ export default async function handler(req, res) {
     process.env.SUPABASE_SECRET_KEY?.trim();
 
   if (!supabaseUrl || !supabaseKey) {
-    return responder(res, 500, "Falta configurar Supabase");
+    return responder(
+      res,
+      500,
+      "Falta configurar Supabase"
+    );
   }
 
   const { tokenDescarga } = req.body || {};
@@ -42,7 +61,11 @@ export default async function handler(req, res) {
     typeof tokenDescarga !== "string" ||
     !/^[a-f0-9]{64}$/i.test(tokenDescarga)
   ) {
-    return responder(res, 401, "Clave de descarga inválida");
+    return responder(
+      res,
+      401,
+      "Clave de descarga inválida"
+    );
   }
 
   const hash = crypto
@@ -69,22 +92,39 @@ export default async function handler(req, res) {
     consultaUrl.searchParams.set("limit", "2");
 
     const consulta = await fetch(consultaUrl, {
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Accept: "application/json"
-      },
+      headers: credencialesSupabase(
+        supabaseKey,
+        {
+          Accept: "application/json"
+        }
+      ),
       cache: "no-store"
     });
 
     if (!consulta.ok) {
-      throw new Error("No se pudo consultar la solicitud");
+      console.error(
+        "Error consultando solicitud de foto:",
+        consulta.status
+      );
+
+      return responder(
+        res,
+        502,
+        "No se pudo consultar el CV"
+      );
     }
 
     const solicitudes = await consulta.json();
 
-    if (solicitudes.length !== 1) {
-      return responder(res, 404, "No encontramos el CV");
+    if (
+      !Array.isArray(solicitudes) ||
+      solicitudes.length !== 1
+    ) {
+      return responder(
+        res,
+        404,
+        "No encontramos el CV"
+      );
     }
 
     const solicitud = solicitudes[0];
@@ -108,7 +148,11 @@ export default async function handler(req, res) {
     const path = solicitud.datos_cv?.foto_path;
 
     if (typeof path !== "string") {
-      return responder(res, 404, "Este CV no tiene foto");
+      return responder(
+        res,
+        404,
+        "Este CV no tiene foto"
+      );
     }
 
     const patron = new RegExp(
@@ -121,12 +165,15 @@ export default async function handler(req, res) {
     const coincidencia = path.match(patron);
 
     if (!coincidencia) {
-      return responder(res, 400, "Ruta de foto inválida");
+      return responder(
+        res,
+        400,
+        "Ruta de foto inválida"
+      );
     }
 
-    const tipo = FORMATOS[
-      coincidencia[1].toLowerCase()
-    ];
+    const tipo =
+      FORMATOS[coincidencia[1].toLowerCase()];
 
     const rutaArchivo = path
       .split("/")
@@ -140,11 +187,12 @@ export default async function handler(req, res) {
 
     const firma = await fetch(firmaUrl, {
       method: "POST",
-      headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        "Content-Type": "application/json"
-      },
+      headers: credencialesSupabase(
+        supabaseKey,
+        {
+          "Content-Type": "application/json"
+        }
+      ),
       body: JSON.stringify({
         expiresIn: 300
       }),
@@ -152,8 +200,15 @@ export default async function handler(req, res) {
     });
 
     if (!firma.ok) {
-      throw new Error(
-        "No se pudo generar el enlace temporal de la foto"
+      console.error(
+        "Error generando enlace de foto:",
+        firma.status
+      );
+
+      return responder(
+        res,
+        502,
+        "No se pudo generar el enlace de la foto"
       );
     }
 
@@ -163,16 +218,14 @@ export default async function handler(req, res) {
       resultado.signedURL ||
       resultado.signedUrl;
 
-    if (typeof enlace !== "string" || !enlace) {
+    if (
+      typeof enlace !== "string" ||
+      !enlace
+    ) {
       throw new Error(
         "Supabase no devolvió el enlace temporal"
       );
     }
-
-    // Supabase puede devolver:
-    // /object/sign/...
-    // o /storage/v1/object/sign/...
-    // Normalizamos ambos formatos.
 
     const origenSupabase = new URL(supabaseUrl);
 
@@ -181,9 +234,12 @@ export default async function handler(req, res) {
       supabaseUrl
     );
 
-    if (enlaceRecibido.origin !== origenSupabase.origin) {
+    if (
+      enlaceRecibido.origin !==
+      origenSupabase.origin
+    ) {
       throw new Error(
-        "El enlace pertenece a un servidor desconocido"
+        "El enlace pertenece a otro servidor"
       );
     }
 
@@ -202,9 +258,11 @@ export default async function handler(req, res) {
       );
     }
 
-    if (!enlaceRecibido.searchParams.has("token")) {
+    if (
+      !enlaceRecibido.searchParams.has("token")
+    ) {
       throw new Error(
-        "El enlace temporal no contiene autorización"
+        "El enlace no contiene autorización"
       );
     }
 
