@@ -41,6 +41,7 @@ button:disabled{opacity:.6;cursor:wait}
 .cv.modern .sidebox{border:1px solid #b9b9b9;padding:27px 21px;margin-bottom:23px}
 .cv.modern .sidebox p{border-bottom:1px solid #ddd;padding:7px 0}
 .cv.modern .timeline{border-left:2px solid #d2d2d2;padding-left:18px}
+.cv-photo{width:100%;height:190px;object-fit:cover;object-position:center 25%;display:block;margin:0 0 20px;border-radius:5px;background:#e2e8f0}
 .cv.ats{padding:43px 52px}
 .cv.ats .head{text-align:center;border-bottom:1px solid #bbb;padding-bottom:21px;margin-bottom:22px}
 .cv.ats h2{font-size:24px;text-transform:uppercase;margin:0 0 5px}
@@ -139,7 +140,7 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <p>Este es un ejemplo del diseño que elegiste.</p>
 <div class="example-notice">
 <strong>Vista de ejemplo</strong>
-<p>Los datos de Juan Pérez son ficticios. Tu currículum verdadero se habilitará únicamente después de confirmar el pago.</p>
+<p>Los datos de Juan Pérez y la imagen ilustrativa son ficticios. Tu currículum verdadero llevará tus datos y, si elegiste el diseño moderno con foto, la imagen que subiste.</p>
 </div>
 <div class="preview" id="preview"></div>
 <div class="actions">
@@ -175,6 +176,7 @@ let current = 0;
 let design = "modern";
 let photoFile = null;
 let paidCV = null;
+let paidPhoto = "";
 
 const steps = [...document.querySelectorAll(".step")];
 const el = id => document.getElementById(id);
@@ -232,10 +234,11 @@ function choose(selected) {
 function photoChanged(event) {
   const file = event.target.files[0];
   photoFile = null;
+
   if (!file) return;
 
   if (
-    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+    !["image/jpeg","image/png","image/webp"].includes(file.type) ||
     file.size === 0 ||
     file.size > 5 * 1024 * 1024
   ) {
@@ -260,6 +263,7 @@ async function subirFotoPrivada(tokenDescarga, file) {
   });
 
   const permiso = await autorizacion.json();
+
   if (!autorizacion.ok) {
     throw new Error(permiso.error || "No se pudo autorizar la foto");
   }
@@ -274,15 +278,21 @@ async function subirFotoPrivada(tokenDescarga, file) {
   }
 
   const base = new URL(permiso.supabaseUrl);
+
   if (base.protocol !== "https:") {
     throw new Error("La conexión de fotos no es segura");
   }
 
-  const ruta = permiso.path.split("/").map(encodeURIComponent).join("/");
+  const ruta = permiso.path
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/");
+
   const urlSubida = new URL(
     `/storage/v1/object/upload/sign/fotos-cv/${ruta}`,
     base
   );
+
   urlSubida.searchParams.set("token", permiso.token);
 
   const subida = await fetch(urlSubida, {
@@ -306,10 +316,30 @@ async function subirFotoPrivada(tokenDescarga, file) {
   });
 
   const resultado = await confirmacion.json();
+
   if (!confirmacion.ok || !resultado.ok) {
     throw new Error(resultado.error || "No se pudo asociar la foto al CV");
   }
 }
+
+// Retrato ilustrativo ficticio para el ejemplo.
+// No utiliza fotos privadas de clientes.
+const fotoEjemploSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="350" viewBox="0 0 300 350">
+  <rect width="300" height="350" fill="#e5e7eb"/>
+  <circle cx="150" cy="125" r="62" fill="#d5a27f"/>
+  <path d="M88 112 Q90 35 151 42 Q217 40 213 116 Q185 83 150 88 Q115 82 88 112" fill="#30333d"/>
+  <ellipse cx="126" cy="130" rx="5" ry="4" fill="#37302d"/>
+  <ellipse cx="174" cy="130" rx="5" ry="4" fill="#37302d"/>
+  <path d="M139 160 Q150 168 162 160" fill="none" stroke="#855a48" stroke-width="3" stroke-linecap="round"/>
+  <path d="M55 350 Q62 228 150 226 Q238 228 245 350" fill="#263b5c"/>
+  <path d="M115 235 L150 285 L185 235" fill="#ffffff"/>
+  <path d="M145 277 L150 292 L155 277 L166 350 L134 350 Z" fill="#345b92"/>
+</svg>`;
+
+const fotoEjemplo =
+  "data:image/svg+xml;charset=utf-8," +
+  encodeURIComponent(fotoEjemploSVG);
 
 const ejemplo = {
   nombre:"Juan Pérez",
@@ -334,8 +364,9 @@ function escapeHTML(value) {
   })[char]);
 }
 
-function renderCV(data,selectedDesign) {
+function renderCV(data, selectedDesign, foto = "") {
   const d = {};
+
   const fields = [
     "nombre","telefono","email","ciudad","perfil",
     "experiencia","educacion","cursos","habilidades","idiomas"
@@ -346,6 +377,10 @@ function renderCV(data,selectedDesign) {
   }
 
   if (selectedDesign === "modern") {
+    const fotoHTML = foto
+      ? `<img class="cv-photo" src="${escapeHTML(foto)}" alt="Foto de perfil">`
+      : "";
+
     return `
       <article class="cv modern">
         <div>
@@ -368,6 +403,7 @@ function renderCV(data,selectedDesign) {
           </section>
         </div>
         <aside>
+          ${fotoHTML}
           <div class="sidebox">
             <h3>Contacto</h3>
             <p>${d.telefono}</p>
@@ -406,7 +442,12 @@ function renderCV(data,selectedDesign) {
 }
 
 function showExample() {
-  el("preview").innerHTML = renderCV(ejemplo,design);
+  el("preview").innerHTML = renderCV(
+    ejemplo,
+    design,
+    design === "modern" ? fotoEjemplo : ""
+  );
+
   showCard("previewCard");
 }
 
@@ -435,7 +476,7 @@ async function testPayment() {
       idiomas:val("idiomas")
     };
 
-    const response = await fetch("/api/crear-pago",{
+    const response = await fetch("/api/crear-pago", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({datos_cv,diseno:design})
@@ -467,10 +508,11 @@ async function testPayment() {
       throw new Error("El enlace no pertenece a Mercado Pago");
     }
 
-    // Conservamos la clave aunque se cierre la pestaña.
-    localStorage.setItem("micvya_token_descarga",data.tokenDescarga);
+    localStorage.setItem(
+      "micvya_token_descarga",
+      data.tokenDescarga
+    );
 
-    // La foto se sube y se confirma antes de abrir Mercado Pago.
     if (design === "modern" && photoFile) {
       button.textContent = "Guardando tu foto...";
       await subirFotoPrivada(data.tokenDescarga, photoFile);
@@ -479,10 +521,39 @@ async function testPayment() {
     window.location.assign(url.href);
 
   } catch (error) {
-    alert("No pudimos completar la preparación del CV: " + error.message + ". No vuelvas a pagar si ya hiciste un pago.");
+    alert(
+      "No pudimos completar la preparación del CV: " +
+      error.message +
+      ". No vuelvas a pagar si ya hiciste un pago."
+    );
+
     button.disabled = false;
     button.textContent = "Pagar $5.000 y obtener mi CV";
   }
+}
+
+async function obtenerFotoPagada(tokenDescarga) {
+  const response = await fetch("/api/ver-foto", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    cache:"no-store",
+    body:JSON.stringify({tokenDescarga})
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "No se pudo recuperar la foto");
+  }
+
+  if (
+    typeof data.foto !== "string" ||
+    !/^data:image\/(jpeg|png|webp);base64,/.test(data.foto)
+  ) {
+    throw new Error("La foto recibida no es válida");
+  }
+
+  return data.foto;
 }
 
 async function verifyPayment() {
@@ -503,7 +574,7 @@ async function verifyPayment() {
     "Consultando el estado del pago...";
 
   try {
-    const response = await fetch("/api/verificar-cv",{
+    const response = await fetch("/api/verificar-cv", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       cache:"no-store",
@@ -534,8 +605,27 @@ async function verifyPayment() {
       diseno:data.diseno
     };
 
+    paidPhoto = "";
+
+    if (
+      paidCV.diseno === "modern" &&
+      paidCV.datos_cv.foto_path
+    ) {
+      el("paymentMessage").textContent =
+        "Pago confirmado. Recuperando tu foto...";
+
+      try {
+        paidPhoto = await obtenerFotoPagada(token);
+      } catch (errorFoto) {
+        console.error("No se pudo cargar la foto:", errorFoto);
+        el("paymentMessage").textContent =
+          "Tu pago está aprobado, pero no pudimos cargar la foto. Volvé a comprobar para intentar recuperarla.";
+        return;
+      }
+    }
+
     el("realPreview").innerHTML =
-      renderCV(paidCV.datos_cv,paidCV.diseno);
+      renderCV(paidCV.datos_cv,paidCV.diseno,paidPhoto);
 
     showCard("resultCard");
 
@@ -560,9 +650,14 @@ function downloadCV() {
     return;
   }
 
-  const content = renderCV(paidCV.datos_cv,paidCV.diseno);
+  const content = renderCV(
+    paidCV.datos_cv,
+    paidCV.diseno,
+    paidPhoto
+  );
 
   printWindow.document.open();
+
   printWindow.document.write(`
     <!doctype html>
     <html lang="es">
@@ -582,6 +677,7 @@ function downloadCV() {
         .cv.modern .sidebox{border:1px solid #bbb;padding:15px;margin-bottom:15px;break-inside:avoid}
         .cv.modern .sidebox p{border-bottom:1px solid #ddd;padding:6px 0}
         .cv.modern .timeline{border-left:2px solid #ddd;padding-left:12px}
+        .cv-photo{width:100%;height:160px;object-fit:cover;object-position:center 25%;display:block;margin:0 0 15px;border-radius:5px}
         .cv.ats .head{text-align:center;border-bottom:1px solid #bbb;padding-bottom:15px;margin-bottom:20px}
         .cv.ats h2{font-size:19pt;text-transform:uppercase;margin:0 0 5px}
         .cv.ats .contact{font-size:9pt}
@@ -594,11 +690,25 @@ function downloadCV() {
   `);
 
   printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
+
+  const imagen = printWindow.document.querySelector(".cv-photo");
+
+  const imprimir = () => {
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  if (imagen && !imagen.complete) {
+    imagen.onload = imprimir;
+    imagen.onerror = () => {
+      alert("No se pudo cargar la foto para imprimir.");
+    };
+  } else {
+    imprimir();
+  }
 }
 
-window.addEventListener("DOMContentLoaded",() => {
+window.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem("micvya_token_descarga")) {
     verifyPayment();
   } else if (
