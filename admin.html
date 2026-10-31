@@ -3,140 +3,477 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <meta
+    name="robots"
+    content="noindex, nofollow"
+  >
+
   <title>Administración | MiCVYa</title>
+
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #f4f6fb;
       color: #17233b;
     }
+
     header {
       background: #17233b;
       color: white;
-      padding: 20px;
-      font-size: 22px;
-      font-weight: bold;
+      padding: 20px 24px;
     }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .marca {
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .marca span {
+      color: #9fb8ff;
+    }
+
+    .header-subtitulo {
+      font-size: 12px;
+      color: #c8d3e9;
+      margin-top: 5px;
+    }
+
     main {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 35px auto;
-      padding: 0 18px;
+      padding: 0 18px 40px;
     }
+
     .card {
       background: white;
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 5px 20px #17233b12;
+      border-radius: 15px;
+      padding: 26px;
+      box-shadow: 0 5px 20px rgba(23, 35, 59, .07);
       margin-bottom: 20px;
     }
-    h1 { margin-top: 0; }
-    .login { max-width: 420px; margin: 65px auto; }
-    label { display: block; margin: 15px 0 6px; }
+
+    .login {
+      max-width: 430px;
+      margin: 65px auto;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin: 0 0 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin: 0 0 18px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .muted {
+      color: #68758a;
+    }
+
+    label {
+      display: block;
+      margin: 17px 0 7px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
     input {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border: 1px solid #cbd3e0;
-      border-radius: 8px;
+      border-radius: 9px;
       font-size: 15px;
+      background: white;
+      color: #17233b;
     }
+
+    input:focus {
+      outline: 2px solid #2457e7;
+      outline-offset: 1px;
+    }
+
     button {
       background: #2457e7;
       color: white;
       border: 0;
-      border-radius: 8px;
-      padding: 13px 18px;
+      border-radius: 9px;
+      padding: 13px 20px;
       cursor: pointer;
-      margin-top: 18px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 700;
     }
+
+    button:hover {
+      background: #1744c3;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .btn-login {
+      width: 100%;
+      margin-top: 23px;
+    }
+
+    .btn-secundario {
+      background: #edf1fb;
+      color: #17233b;
+    }
+
+    .btn-secundario:hover {
+      background: #dfe7f8;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .mensaje {
+      font-size: 14px;
+      margin-top: 17px;
+      min-height: 20px;
+      color: #b42318;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .dashboard-header p {
+      margin: 4px 0 0;
+    }
+
+    .acciones {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .stats {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
     }
+
     .stat {
-      background: #f4f6fb;
-      padding: 20px;
-      border-radius: 10px;
+      background: white;
+      border-radius: 14px;
+      padding: 23px;
+      box-shadow: 0 5px 20px rgba(23, 35, 59, .06);
     }
+
+    .stat-label {
+      font-size: 13px;
+      color: #68758a;
+      font-weight: 600;
+    }
+
     .stat strong {
       display: block;
-      font-size: 27px;
-      margin-top: 10px;
+      font-size: 29px;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
     }
-    table { width: 100%; border-collapse: collapse; }
-    th, td {
+
+    .stat small {
+      display: block;
+      color: #8290a5;
+      font-size: 12px;
+      margin-top: 9px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 580px;
+    }
+
+    th,
+    td {
       text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid #e4e8f0;
+      padding: 14px 12px;
+      border-bottom: 1px solid #e8ecf3;
+      font-size: 14px;
     }
-    .hidden { display: none; }
-    .muted { color: #68758a; }
-    @media(max-width: 600px) {
-      .stats { grid-template-columns: 1fr; }
-      .card { padding: 16px; }
+
+    th {
+      color: #68758a;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    tbody tr:hover {
+      background: #f8faff;
+    }
+
+    .estado {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .estado-aprobado {
+      background: #e7f7ee;
+      color: #167347;
+    }
+
+    .estado-pendiente {
+      background: #fff4d8;
+      color: #946200;
+    }
+
+    .estado-otro {
+      background: #eef1f5;
+      color: #596579;
+    }
+
+    .nota {
+      font-size: 12px;
+      color: #8290a5;
+      margin-top: 15px;
+      line-height: 1.6;
+    }
+
+    .error-panel {
+      color: #b42318;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin-top: 20px;
+      }
+
+      .card {
+        padding: 19px;
+      }
+
+      .login {
+        margin: 35px auto;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .stat strong {
+        font-size: 26px;
+      }
+
+      .dashboard-header {
+        align-items: flex-start;
+      }
+
+      .acciones {
+        width: 100%;
+      }
+
+      .acciones button {
+        flex: 1;
+      }
     }
   </style>
 </head>
+
 <body>
-  <header>MiCVYa | Administración</header>
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="marca">
+          Mi<span>CV</span>Ya
+        </div>
+        <div class="header-subtitulo">
+          Administración privada
+        </div>
+      </div>
+    </div>
+  </header>
 
   <main>
+
+    <!-- INICIO DE SESIÓN -->
+
     <section id="login" class="card login">
-      <h1>Acceso privado</h1>
+
+      <h1>Acceso administrador</h1>
+
       <p class="muted">
-        Ingresá con tu cuenta de administrador.
+        Ingresá con tu cuenta privada de MiCVYa
+        para consultar las ventas.
       </p>
 
       <form id="loginForm">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" required
-               autocomplete="username">
 
-        <label for="password">Contraseña</label>
-        <input id="password" type="password" required
-               autocomplete="current-password">
+        <label for="email">
+          Correo electrónico
+        </label>
 
-        <button type="submit">Ingresar</button>
+        <input
+          id="email"
+          type="email"
+          autocomplete="username"
+          required
+        >
+
+        <label for="password">
+          Contraseña
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button
+          id="btnIngresar"
+          class="btn-login"
+          type="submit"
+        >
+          Ingresar al panel
+        </button>
+
       </form>
 
-      <p id="mensaje" class="muted"></p>
+      <p
+        id="mensaje"
+        class="mensaje"
+        role="alert"
+      ></p>
+
     </section>
 
-    <section id="dashboard" class="hidden">
-      <div class="card">
-        <h1>Panel de ventas</h1>
-        <p class="muted">
-          Resumen de las compras de MiCVYa.
-        </p>
+    <!-- PANEL DE ADMINISTRACIÓN -->
 
-        <div class="stats">
-          <div class="stat">
-            Ventas aprobadas
-            <strong id="aprobadas">—</strong>
-          </div>
-          <div class="stat">
-            Recaudación bruta
-            <strong id="recaudacion">—</strong>
-          </div>
-          <div class="stat">
-            Solicitudes pendientes
-            <strong id="pendientes">—</strong>
-          </div>
-          <div class="stat">
-            Total de solicitudes
-            <strong id="total">—</strong>
-          </div>
+    <section id="dashboard" class="hidden">
+
+      <div class="dashboard-header">
+
+        <div>
+          <h1>Panel de ventas</h1>
+          <p class="muted">
+            Resumen de las compras de MiCVYa.
+          </p>
         </div>
+
+        <div class="acciones">
+
+          <button
+            id="actualizar"
+            type="button"
+            class="btn-secundario"
+          >
+            Actualizar
+          </button>
+
+          <button
+            id="salir"
+            type="button"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+      <p
+        id="errorPanel"
+        class="error-panel hidden"
+        role="alert"
+      ></p>
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-label">
+            Ventas aprobadas
+          </div>
+          <strong id="aprobadas">—</strong>
+          <small>Pagos confirmados</small>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">
+            Recaudación bruta
+          </div>
+          <strong id="recaudacion">—</strong>
+          <small>Antes de comisiones y devoluciones</small>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">
+            Pagos pendientes
+          </div>
+          <strong id="pendientes">—</strong>
+          <small>Solicitudes sin pago confirmado</small>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">
+            Total de solicitudes
+          </div>
+          <strong id="total">—</strong>
+          <small>CV iniciados</small>
+        </div>
+
       </div>
 
       <div class="card">
-        <h2>Últimas ventas</h2>
-        <div style="overflow-x:auto">
+
+        <h2>Últimas solicitudes</h2>
+
+        <div class="table-wrap">
+
           <table>
+
             <thead>
               <tr>
                 <th>Fecha</th>
@@ -145,29 +482,336 @@
                 <th>Importe</th>
               </tr>
             </thead>
+
             <tbody id="ventas">
               <tr>
                 <td colspan="4">
-                  Pendiente de conectar con Supabase.
+                  Cargando ventas...
                 </td>
               </tr>
             </tbody>
+
           </table>
+
         </div>
+
+        <p id="notaLimite" class="nota">
+          Se muestran hasta 50 solicitudes recientes.
+        </p>
+
       </div>
 
-      <button id="salir" type="button">Cerrar sesión</button>
     </section>
+
   </main>
 
   <script>
-    document.getElementById("loginForm")
-      .addEventListener("submit", function(event) {
+    let tokenAdmin = null;
+    let expiracionSesion = 0;
+
+    const login = document.getElementById("login");
+    const dashboard = document.getElementById("dashboard");
+
+    const formulario =
+      document.getElementById("loginForm");
+
+    const mensaje =
+      document.getElementById("mensaje");
+
+    const botonIngresar =
+      document.getElementById("btnIngresar");
+
+    const errorPanel =
+      document.getElementById("errorPanel");
+
+    const botonActualizar =
+      document.getElementById("actualizar");
+
+    const formatoDinero = new Intl.NumberFormat(
+      "es-AR",
+      {
+        style: "currency",
+        currency: "ARS",
+        maximumFractionDigits: 0
+      }
+    );
+
+    function mostrarErrorPanel(texto) {
+      errorPanel.textContent = texto;
+      errorPanel.classList.remove("hidden");
+    }
+
+    function limpiarErrorPanel() {
+      errorPanel.textContent = "";
+      errorPanel.classList.add("hidden");
+    }
+
+    function cerrarSesion() {
+      tokenAdmin = null;
+      expiracionSesion = 0;
+
+      dashboard.classList.add("hidden");
+      login.classList.remove("hidden");
+
+      formulario.reset();
+      mensaje.textContent = "";
+
+      document.getElementById("aprobadas")
+        .textContent = "—";
+
+      document.getElementById("pendientes")
+        .textContent = "—";
+
+      document.getElementById("total")
+        .textContent = "—";
+
+      document.getElementById("recaudacion")
+        .textContent = "—";
+
+      document.getElementById("ventas")
+        .replaceChildren();
+
+      limpiarErrorPanel();
+    }
+
+    function crearCelda(fila, texto) {
+      const celda = fila.insertCell();
+      celda.textContent = String(texto);
+      return celda;
+    }
+
+    function dibujarVentas(ventas) {
+      const cuerpo =
+        document.getElementById("ventas");
+
+      cuerpo.replaceChildren();
+
+      if (!ventas.length) {
+        const fila = cuerpo.insertRow();
+        const celda = fila.insertCell();
+
+        celda.colSpan = 4;
+        celda.textContent =
+          "Todavía no hay solicitudes.";
+
+        return;
+      }
+
+      ventas.forEach(venta => {
+        const fila = cuerpo.insertRow();
+
+        let fecha = "—";
+
+        if (venta.fecha) {
+          const fechaObjeto = new Date(
+            venta.fecha
+          );
+
+          if (!Number.isNaN(fechaObjeto.getTime())) {
+            fecha = fechaObjeto.toLocaleString(
+              "es-AR"
+            );
+          }
+        }
+
+        const diseno =
+          venta.diseno === "modern"
+            ? "Moderno"
+            : venta.diseno === "ats"
+              ? "ATS"
+              : "—";
+
+        crearCelda(fila, fecha);
+        crearCelda(fila, diseno);
+
+        const celdaEstado = fila.insertCell();
+
+        const etiqueta =
+          document.createElement("span");
+
+        const estado = String(
+          venta.estado || "desconocido"
+        );
+
+        etiqueta.textContent = estado;
+
+        etiqueta.className = "estado " + (
+          estado === "aprobado"
+            ? "estado-aprobado"
+            : estado === "pendiente"
+              ? "estado-pendiente"
+              : "estado-otro"
+        );
+
+        celdaEstado.appendChild(etiqueta);
+
+        crearCelda(
+          fila,
+          formatoDinero.format(
+            Number(venta.importe) || 0
+          )
+        );
+      });
+    }
+
+    async function cargarVentas() {
+      if (
+        !tokenAdmin ||
+        Date.now() >= expiracionSesion
+      ) {
+        cerrarSesion();
+        throw new Error(
+          "Tu sesión venció. Ingresá nuevamente."
+        );
+      }
+
+      const respuesta = await fetch(
+        "/api/admin-ventas",
+        {
+          method: "GET",
+          headers: {
+            Authorization:
+              `Bearer ${tokenAdmin}`
+          },
+          cache: "no-store"
+        }
+      );
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        if (
+          respuesta.status === 401 ||
+          respuesta.status === 403
+        ) {
+          cerrarSesion();
+        }
+
+        throw new Error(
+          datos.error ||
+          "No se pudieron cargar las ventas"
+        );
+      }
+
+      document.getElementById("aprobadas")
+        .textContent = datos.aprobadas;
+
+      document.getElementById("pendientes")
+        .textContent = datos.pendientes;
+
+      document.getElementById("total")
+        .textContent = datos.total;
+
+      document.getElementById("recaudacion")
+        .textContent = formatoDinero.format(
+          datos.recaudacion
+        );
+
+      dibujarVentas(datos.ventas || []);
+
+      document.getElementById("notaLimite")
+        .textContent = datos.limitado
+          ? "Atención: el resumen está limitado a las 1.000 solicitudes más recientes. Los totales podrían ser mayores."
+          : "Se muestran hasta 50 solicitudes recientes. La recaudación es bruta estimada, sin descontar comisiones ni devoluciones.";
+    }
+
+    formulario.addEventListener(
+      "submit",
+      async function(event) {
         event.preventDefault();
 
-        document.getElementById("mensaje").textContent =
-          "La autenticación se habilitará en el siguiente paso.";
-      });
+        botonIngresar.disabled = true;
+        mensaje.textContent =
+          "Verificando acceso...";
+
+        try {
+          const respuesta = await fetch(
+            "/api/admin-ventas",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+              body: JSON.stringify({
+                email: document
+                  .getElementById("email")
+                  .value,
+                password: document
+                  .getElementById("password")
+                  .value
+              }),
+              cache: "no-store"
+            }
+          );
+
+          const datos = await respuesta.json();
+
+          if (!respuesta.ok) {
+            throw new Error(
+              datos.error ||
+              "No se pudo iniciar sesión"
+            );
+          }
+
+          tokenAdmin = datos.access_token;
+
+          const duracion = Number(
+            datos.expires_in
+          ) || 3600;
+
+          expiracionSesion =
+            Date.now() + duracion * 1000;
+
+          await cargarVentas();
+
+          formulario.reset();
+          mensaje.textContent = "";
+
+          login.classList.add("hidden");
+          dashboard.classList.remove("hidden");
+
+        } catch (error) {
+          tokenAdmin = null;
+          expiracionSesion = 0;
+
+          mensaje.textContent =
+            error.message ||
+            "Ocurrió un error";
+        } finally {
+          botonIngresar.disabled = false;
+        }
+      }
+    );
+
+    botonActualizar.addEventListener(
+      "click",
+      async function() {
+        botonActualizar.disabled = true;
+        limpiarErrorPanel();
+
+        try {
+          await cargarVentas();
+        } catch (error) {
+          if (
+            !dashboard.classList.contains("hidden")
+          ) {
+            mostrarErrorPanel(error.message);
+          } else {
+            mensaje.textContent = error.message;
+          }
+        } finally {
+          botonActualizar.disabled = false;
+        }
+      }
+    );
+
+    document.getElementById("salir")
+      .addEventListener(
+        "click",
+        cerrarSesion
+      );
   </script>
+
 </body>
 </html>
