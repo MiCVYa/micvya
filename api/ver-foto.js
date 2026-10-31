@@ -9,10 +9,9 @@ const FORMATOS = {
   webp: "image/webp"
 };
 
-const MAX_BYTES = 5 * 1024 * 1024;
-
 function responder(res, codigo, mensaje) {
   return res.status(codigo).json({
+    ok: false,
     error: mensaje
   });
 }
@@ -22,6 +21,7 @@ export default async function handler(req, res) {
   res.setHeader("X-Content-Type-Options", "nosniff");
 
   if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     return responder(res, 405, "Método no permitido");
   }
 
@@ -66,11 +66,15 @@ export default async function handler(req, res) {
       "id,estado_pago,diseno,datos_cv"
     );
 
+    consultaUrl.searchParams.set("limit", "2");
+
     const consulta = await fetch(consultaUrl, {
       headers: {
         apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
         Accept: "application/json"
-      }
+      },
+      cache: "no-store"
     });
 
     if (!consulta.ok) {
@@ -86,11 +90,19 @@ export default async function handler(req, res) {
     const solicitud = solicitudes[0];
 
     if (solicitud.estado_pago !== "aprobado") {
-      return responder(res, 403, "El pago todavía no está aprobado");
+      return responder(
+        res,
+        403,
+        "El pago todavía no está aprobado"
+      );
     }
 
     if (solicitud.diseno !== "modern") {
-      return responder(res, 404, "Este diseño no utiliza foto");
+      return responder(
+        res,
+        404,
+        "Este diseño no utiliza foto"
+      );
     }
 
     const path = solicitud.datos_cv?.foto_path;
@@ -119,52 +131,69 @@ export default async function handler(req, res) {
       .map(encodeURIComponent)
       .join("/");
 
-    const fotoUrl = new URL(
-      `/storage/v1/object/authenticated/${BUCKET}/${rutaArchivo}`,
+    const firmaUrl = new URL(
+      `/storage/v1/object/sign/${BUCKET}/${rutaArchivo}`,
       supabaseUrl
     );
 
-    const foto = await fetch(fotoUrl, {
+    const firma = await fetch(firmaUrl, {
+      method: "POST",
       headers: {
-        apikey: supabaseKey
-      }
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        expiresIn: 300
+      }),
+      cache: "no-store"
     });
 
-    if (!foto.ok) {
-      return responder(res, 404, "No encontramos la foto");
+    if (!firma.ok) {
+      throw new Error(
+        "No se pudo generar el enlace temporal de la foto"
+      );
     }
 
-    const contenido = Buffer.from(
-      await foto.arrayBuffer()
-    );
+    const resultado = await firma.json();
+
+    const enlace = resultado.signedURL ||
+      resultado.signedUrl;
+
+    if (typeof enlace !== "string" || !enlace) {
+      throw new Error(
+        "Supabase no devolvió el enlace temporal"
+      );
+    }
+
+    const fotoUrl = new URL(enlace, supabaseUrl);
+    const origenSupabase = new URL(supabaseUrl);
 
     if (
-      contenido.length === 0 ||
-      contenido.length > MAX_BYTES
+      fotoUrl.origin !== origenSupabase.origin ||
+      !fotoUrl.pathname.startsWith(
+        `/storage/v1/object/sign/${BUCKET}/`
+      )
     ) {
-      return responder(res, 400, "La foto no es válida");
+      throw new Error(
+        "El enlace temporal no es válido"
+      );
     }
 
-    const tipoReal = foto.headers
-      .get("content-type")
-      ?.split(";")[0]
-      .trim()
-      .toLowerCase();
-
-    if (tipoReal !== tipo) {
-      return responder(res, 400, "Formato de foto inválido");
-    }
-
-    // Devolvemos la imagen como base64 para que
-    // el navegador pueda mostrarla en el CV.
     return res.status(200).json({
       ok: true,
-      foto: `data:${tipo};base64,${contenido.toString("base64")}`
+      fotoUrl: fotoUrl.href,
+      tipo,
+      venceEnSegundos: 300
     });
 
   } catch (error) {
     console.error("Error al consultar la foto:", error);
 
-    return responder(res, 500, "No se pudo obtener la foto");
+    return responder(
+      res,
+      500,
+      "No se pudo obtener la foto"
+    );
   }
 }
