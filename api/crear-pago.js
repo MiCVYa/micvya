@@ -3,6 +3,9 @@ import crypto from "node:crypto";
 
 const PRECIO_CV = 5000;
 
+const URL_REGRESO =
+  "https://micvya-git-prueba-mercadopago-mi-cvy-a.vercel.app/";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -94,10 +97,10 @@ export default async function handler(req, res) {
 
   const referencia = crypto.randomUUID();
 
-  // Clave privada para acceder al CV después del pago.
-  const tokenDescarga = crypto.randomBytes(32).toString("hex");
+  const tokenDescarga = crypto
+    .randomBytes(32)
+    .toString("hex");
 
-  // Supabase guarda solamente la huella de la clave.
   const tokenDescargaHash = crypto
     .createHash("sha256")
     .update(tokenDescarga)
@@ -139,16 +142,6 @@ export default async function handler(req, res) {
       });
     }
 
-    const dominio = process.env.VERCEL_URL;
-
-    if (!dominio) {
-      return res.status(500).json({
-        error: "Falta configurar la dirección de MiCVYa"
-      });
-    }
-
-    const regreso = `https://${dominio}/`;
-
     const respuestaPago = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
@@ -171,9 +164,9 @@ export default async function handler(req, res) {
           external_reference: referencia,
           notification_url: notificationUrl,
           back_urls: {
-            success: regreso,
-            failure: regreso,
-            pending: regreso
+            success: URL_REGRESO,
+            failure: URL_REGRESO,
+            pending: URL_REGRESO
           }
         })
       }
