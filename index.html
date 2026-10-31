@@ -7,202 +7,55 @@
 <title>MiCVYa | Tu currículum fácil</title>
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font:16px Arial,sans-serif;
-  background:#f4f6fb;
-  color:#20263a;
-}
-header{
-  background:#172554;
-  color:white;
-  padding:22px 7%;
-  font-size:25px;
-  font-weight:bold;
-}
+body{margin:0;font:16px Arial,sans-serif;background:#f4f6fb;color:#20263a}
+header{background:#172554;color:white;padding:22px 7%;font-size:25px;font-weight:bold}
 header span{color:#60a5fa}
-main{
-  max-width:850px;
-  margin:38px auto;
-  padding:0 18px;
-}
-.card{
-  background:white;
-  border-radius:18px;
-  padding:30px;
-  box-shadow:0 8px 30px #17255412;
-  margin-bottom:24px;
-}
+main{max-width:850px;margin:38px auto;padding:0 18px}
+.card{background:white;border-radius:18px;padding:30px;box-shadow:0 8px 30px #17255412;margin-bottom:24px}
 h1{font-size:32px}
 p{line-height:1.5;color:#64748b}
-label{
-  display:block;
-  font-weight:bold;
-  margin:17px 0 7px;
-}
-input,textarea{
-  width:100%;
-  padding:14px;
-  border:1px solid #cbd5e1;
-  border-radius:9px;
-  font:16px Arial;
-}
+label{display:block;font-weight:bold;margin:17px 0 7px}
+input,textarea{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:9px;font:16px Arial}
 textarea{min-height:95px}
-button{
-  border:0;
-  border-radius:10px;
-  padding:14px 20px;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-}
+button{border:0;border-radius:10px;padding:14px 20px;font-size:16px;font-weight:bold;cursor:pointer}
 button:disabled{opacity:.6;cursor:wait}
 .primary{background:#2563eb;color:white}
 .secondary{background:#e2e8f0;color:#1e293b}
-.actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:24px;
-}
-.progress{
-  height:8px;
-  background:#e2e8f0;
-  border-radius:20px;
-  margin:22px 0;
-  overflow:hidden;
-}
-#bar{
-  height:100%;
-  background:#2563eb;
-  width:16.67%;
-}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.progress{height:8px;background:#e2e8f0;border-radius:20px;margin:22px 0;overflow:hidden}
+#bar{height:100%;background:#2563eb;width:16.67%}
 .step{display:none}
 .step.active{display:block}
 .hint{font-size:13px}
-.choices{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-.choice{
-  border:2px solid #cbd5e1;
-  background:white;
-  color:#20263a;
-  text-align:left;
-}
-.choice.selected{
-  border-color:#2563eb;
-  background:#eff6ff;
-}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{border:2px solid #cbd5e1;background:white;color:#20263a;text-align:left}
+.choice.selected{border-color:#2563eb;background:#eff6ff}
 [hidden]{display:none!important}
-.preview{
-  background:#e9edf3;
-  padding:12px;
-  overflow:auto;
-}
-.cv{
-  width:794px;
-  min-height:1123px;
-  padding:49px 52px;
-  background:white;
-  color:#111;
-  font-family:Arial,sans-serif;
-  line-height:1.45;
-  box-shadow:0 4px 20px #15234220;
-  overflow-wrap:anywhere;
-}
+.preview{background:#e9edf3;padding:12px;overflow:auto}
+.cv{width:794px;min-height:1123px;padding:49px 52px;background:white;color:#111;font-family:Arial,sans-serif;line-height:1.45;box-shadow:0 4px 20px #15234220;overflow-wrap:anywhere}
 .cv section{margin:0 0 24px}
-.cv p{
-  font-size:12px;
-  line-height:1.55;
-  white-space:pre-wrap;
-  color:#111;
-}
-.cv.modern{
-  display:grid;
-  grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);
-  gap:30px;
-  padding:46px 52px;
-}
-.cv.modern h2{
-  font-family:Georgia,serif;
-  font-size:37px;
-  line-height:1.05;
-  letter-spacing:-1px;
-  margin:0 0 32px;
-}
-.cv.modern h3{
-  font-family:Georgia,serif;
-  font-size:18px;
-  color:#2858a7;
-  margin:0 0 9px;
-}
-.cv.modern .sidebox{
-  border:1px solid #b9b9b9;
-  padding:27px 21px;
-  margin-bottom:23px;
-}
-.cv.modern .sidebox p{
-  border-bottom:1px solid #ddd;
-  padding:7px 0;
-}
-.cv.modern .photo{
-  display:block;
-  width:125px;
-  height:125px;
-  border-radius:50%;
-  object-fit:cover;
-  margin:0 auto 18px;
-}
-.cv.modern .timeline{
-  border-left:2px solid #d2d2d2;
-  padding-left:18px;
-}
+.cv p{font-size:12px;line-height:1.55;white-space:pre-wrap;color:#111}
+.cv.modern{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);gap:30px;padding:46px 52px}
+.cv.modern h2{font-family:Georgia,serif;font-size:37px;line-height:1.05;letter-spacing:-1px;margin:0 0 32px}
+.cv.modern h3{font-family:Georgia,serif;font-size:18px;color:#2858a7;margin:0 0 9px}
+.cv.modern .sidebox{border:1px solid #b9b9b9;padding:27px 21px;margin-bottom:23px}
+.cv.modern .sidebox p{border-bottom:1px solid #ddd;padding:7px 0}
+.cv.modern .timeline{border-left:2px solid #d2d2d2;padding-left:18px}
 .cv.ats{padding:43px 52px}
-.cv.ats .head{
-  text-align:center;
-  border-bottom:1px solid #bbb;
-  padding-bottom:21px;
-  margin-bottom:22px;
-}
-.cv.ats h2{
-  font-size:24px;
-  text-transform:uppercase;
-  margin:0 0 5px;
-}
-.cv.ats .contact{
-  font-size:10px;
-  color:#444;
-}
+.cv.ats .head{text-align:center;border-bottom:1px solid #bbb;padding-bottom:21px;margin-bottom:22px}
+.cv.ats h2{font-size:24px;text-transform:uppercase;margin:0 0 5px}
+.cv.ats .contact{font-size:10px;color:#444}
 .cv.ats section{margin-bottom:17px}
-.cv.ats h3{
-  font-size:12px;
-  text-transform:uppercase;
-  margin:0 0 8px;
-}
+.cv.ats h3{font-size:12px;text-transform:uppercase;margin:0 0 8px}
 .cv.ats p{font-size:10.5px}
-.example-notice{
-  padding:14px;
-  background:#eff6ff;
-  border-radius:10px;
-  margin:18px 0;
-  color:#1e40af;
-}
-footer{
-  text-align:center;
-  padding:25px;
-  font-size:13px;
-  color:#64748b;
-}
+.example-notice{padding:14px;background:#eff6ff;border-radius:10px;margin:18px 0;color:#1e40af}
+footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 @media(max-width:600px){
-  .card{padding:20px}
-  .choices{grid-template-columns:1fr}
-  .actions button{flex:1}
+.card{padding:20px}
+.choices{grid-template-columns:1fr}
+.actions button{flex:1}
 }
-@media print{
-  body{display:none!important}
-}
+@media print{body{display:none!important}}
 </style>
 </head>
 <body>
@@ -265,22 +118,14 @@ footer{
 <section class="step">
 <h2>Elegí tu diseño</h2>
 <div class="choices">
-<button type="button" class="choice selected" id="modernBtn" onclick="choose('modern')">
-Moderno con foto opcional
-</button>
-<button type="button" class="choice" id="atsBtn" onclick="choose('ats')">
-Simple compatible con ATS (sin foto)
-</button>
+<button type="button" class="choice selected" id="modernBtn" onclick="choose('modern')">Moderno con foto opcional</button>
+<button type="button" class="choice" id="atsBtn" onclick="choose('ats')">Simple compatible con ATS (sin foto)</button>
 </div>
-
 <div id="photoFields">
 <label>Foto (opcional, hasta 5 MB)</label>
 <input type="file" id="foto" accept="image/*" onchange="photoChanged(event)">
 </div>
-<p class="hint">
-El diseño ATS utiliza una columna y texto seleccionable.
-No garantiza superar todos los sistemas de selección.
-</p>
+<p class="hint">El diseño ATS utiliza una columna y texto seleccionable. No garantiza superar todos los sistemas de selección.</p>
 </section>
 
 <div class="actions">
@@ -292,29 +137,34 @@ No garantiza superar todos los sistemas de selección.
 <div class="card" id="previewCard" hidden>
 <h2>¡Terminaste de completar tus datos!</h2>
 <p>Este es un ejemplo del diseño que elegiste.</p>
-
 <div class="example-notice">
 <strong>Vista de ejemplo</strong>
-<p>
-Los datos de Juan Pérez son ficticios.
-Tu currículum verdadero se habilitará únicamente
-después de confirmar el pago.
-</p>
+<p>Los datos de Juan Pérez son ficticios. Tu currículum verdadero se habilitará únicamente después de confirmar el pago.</p>
 </div>
-
 <div class="preview" id="preview"></div>
-
 <div class="actions">
 <button class="secondary" onclick="editCV()">Editar mis datos</button>
-<button class="primary" id="testPaymentBtn" onclick="testPayment()">
-Pagar $5.000 y obtener mi CV
-</button>
+<button class="primary" id="testPaymentBtn" onclick="testPayment()">Pagar $5.000 y obtener mi CV</button>
+</div>
 </div>
 
-<p class="hint">
-Versión de prueba. La descarga del PDF después del pago
-todavía está en desarrollo.
-</p>
+<div class="card" id="paymentCard" hidden>
+<h2>Estamos comprobando tu pago</h2>
+<p id="paymentMessage">Consultando el estado de tu currículum...</p>
+<div class="actions">
+<button class="primary" id="verifyBtn" onclick="verifyPayment()">Volver a comprobar</button>
+</div>
+<p class="hint">No necesitás pagar otra vez. La confirmación puede tardar unos momentos.</p>
+</div>
+
+<div class="card" id="resultCard" hidden>
+<h2>¡Tu currículum está listo!</h2>
+<p>Tu pago fue confirmado. Este es tu CV verdadero.</p>
+<div class="preview" id="realPreview"></div>
+<div class="actions">
+<button class="primary" id="downloadBtn" onclick="downloadCV()">Guardar mi CV en PDF</button>
+</div>
+<p class="hint">En la ventana de impresión, elegí «Guardar como PDF» como destino. Conservá el archivo en tu dispositivo.</p>
 </div>
 </main>
 
@@ -322,81 +172,74 @@ todavía está en desarrollo.
 
 <script>
 let current = 0;
-let design = 'modern';
-let photoData = '';
+let design = "modern";
+let photoData = "";
+let paidCV = null;
 
-const steps = [...document.querySelectorAll('.step')];
+const steps = [...document.querySelectorAll(".step")];
 const el = id => document.getElementById(id);
 const val = id => el(id).value.trim();
 
-function start(){
-  el('welcome').hidden = true;
-  el('builder').hidden = false;
+function showCard(id) {
+  ["welcome","builder","previewCard","paymentCard","resultCard"]
+    .forEach(name => el(name).hidden = name !== id);
   window.scrollTo(0,0);
 }
 
-function update(){
-  steps.forEach((s,i) => {
-    s.classList.toggle('active',i === current);
-  });
-
-  el('bar').style.width =
-    (100 * (current + 1) / steps.length) + '%';
-
-  el('back').hidden = current === 0;
-
-  el('next').textContent =
-    current === steps.length - 1
-      ? 'Ver ejemplo de mi diseño'
-      : 'Continuar';
+function start() {
+  showCard("builder");
 }
 
-function move(d){
-  if(
-    d === 1 &&
+function update() {
+  steps.forEach((step,i) => {
+    step.classList.toggle("active",i === current);
+  });
+  el("bar").style.width = (100 * (current + 1) / steps.length) + "%";
+  el("back").hidden = current === 0;
+  el("next").textContent =
+    current === steps.length - 1
+      ? "Ver ejemplo de mi diseño"
+      : "Continuar";
+}
+
+function move(direction) {
+  if (
+    direction === 1 &&
     current === 0 &&
-    (!val('nombre') || !val('telefono'))
-  ){
-    alert('Completá tu nombre y teléfono.');
+    (!val("nombre") || !val("telefono"))
+  ) {
+    alert("Completá tu nombre y teléfono.");
     return;
   }
 
-  if(current + d >= steps.length){
+  if (current + direction >= steps.length) {
     showExample();
     return;
   }
 
-  current = Math.max(0,current + d);
+  current = Math.max(0,current + direction);
   update();
   window.scrollTo(0,0);
 }
 
-function choose(d){
-  design = d;
-
-  el('modernBtn').classList.toggle(
-    'selected',d === 'modern'
-  );
-
-  el('atsBtn').classList.toggle(
-    'selected',d === 'ats'
-  );
-
-  el('photoFields').hidden = d === 'ats';
+function choose(selected) {
+  design = selected;
+  el("modernBtn").classList.toggle("selected",selected === "modern");
+  el("atsBtn").classList.toggle("selected",selected === "ats");
+  el("photoFields").hidden = selected === "ats";
 }
 
-function photoChanged(e){
-  const f = e.target.files[0];
-  photoData = '';
+function photoChanged(event) {
+  const file = event.target.files[0];
+  photoData = "";
+  if (!file) return;
 
-  if(!f) return;
-
-  if(
-    !['image/jpeg','image/png','image/webp'].includes(f.type) ||
-    f.size > 5 * 1024 * 1024
-  ){
-    alert('Elegí una foto JPG, PNG o WebP de hasta 5 MB.');
-    e.target.value = '';
+  if (
+    !["image/jpeg","image/png","image/webp"].includes(file.type) ||
+    file.size > 5 * 1024 * 1024
+  ) {
+    alert("Elegí una foto JPG, PNG o WebP de hasta 5 MB.");
+    event.target.value = "";
     return;
   }
 
@@ -404,56 +247,65 @@ function photoChanged(e){
   reader.onload = () => {
     photoData = reader.result;
   };
-  reader.readAsDataURL(f);
+  reader.readAsDataURL(file);
 }
 
-// Datos inventados que se muestran antes de pagar.
 const ejemplo = {
-  nombre: 'Juan Pérez',
-  telefono: '11 1234 5678',
-  email: 'juan.perez@ejemplo.com',
-  ciudad: 'Buenos Aires, Argentina',
-  perfil: 'Persona responsable, organizada y con buena predisposición para aprender. Busco una oportunidad para desarrollar mis habilidades y aportar al equipo.',
-  experiencia: 'Asistente de ventas - Empresa Ejemplo (2022-2025)\nAtención al público, organización de productos y tareas administrativas.',
-  educacion: 'Secundario completo - Escuela Ejemplo (2021)',
-  cursos: 'Curso de Excel básico\nAtención al cliente',
-  habilidades: 'Trabajo en equipo\nComunicación\nOrganización\nResponsabilidad',
-  idiomas: 'Español nativo\nInglés básico'
+  nombre:"Juan Pérez",
+  telefono:"11 1234 5678",
+  email:"juan.perez@ejemplo.com",
+  ciudad:"Buenos Aires, Argentina",
+  perfil:"Persona responsable, organizada y con buena predisposición para aprender.",
+  experiencia:"Asistente de ventas - Empresa Ejemplo (2022-2025)\nAtención al público y organización de productos.",
+  educacion:"Secundario completo - Escuela Ejemplo",
+  cursos:"Curso de Excel básico\nAtención al cliente",
+  habilidades:"Trabajo en equipo\nComunicación\nOrganización",
+  idiomas:"Español nativo\nInglés básico"
 };
 
-function showExample(){
-  const d = ejemplo;
-  let content = '';
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
 
-  if(design === 'modern'){
-    content = `
+function renderCV(data,selectedDesign) {
+  const d = {};
+  const fields = [
+    "nombre","telefono","email","ciudad","perfil",
+    "experiencia","educacion","cursos","habilidades","idiomas"
+  ];
+
+  for (const field of fields) {
+    d[field] = escapeHTML(data[field]);
+  }
+
+  if (selectedDesign === "modern") {
+    return `
       <article class="cv modern">
         <div>
           <h2>${d.nombre}</h2>
-
           <section>
             <h3>Resumen Profesional</h3>
             <p>${d.perfil}</p>
           </section>
-
           <section>
             <h3>Experiencia Laboral</h3>
-            <div class="timeline">
-              <p>${d.experiencia}</p>
-            </div>
+            <div class="timeline"><p>${d.experiencia}</p></div>
           </section>
-
           <section>
             <h3>Cursos y capacitaciones</h3>
             <p>${d.cursos}</p>
           </section>
-
           <section>
             <h3>Idiomas</h3>
             <p>${d.idiomas}</p>
           </section>
         </div>
-
         <aside>
           <div class="sidebox">
             <h3>Contacto</h3>
@@ -461,12 +313,10 @@ function showExample(){
             <p>${d.email}</p>
             <p>${d.ciudad}</p>
           </div>
-
           <div class="sidebox">
             <h3>Formación</h3>
             <p>${d.educacion}</p>
           </div>
-
           <div class="sidebox">
             <h3>Competencias</h3>
             <p>${d.habilidades}</p>
@@ -474,137 +324,212 @@ function showExample(){
         </aside>
       </article>
     `;
-  }else{
-    content = `
-      <article class="cv ats">
-        <div class="head">
-          <h2>${d.nombre}</h2>
-          <div class="contact">
-            ${d.telefono} · ${d.email} · ${d.ciudad}
-          </div>
-        </div>
-
-        <section>
-          <h3>Perfil profesional</h3>
-          <p>${d.perfil}</p>
-        </section>
-
-        <section>
-          <h3>Educación</h3>
-          <p>${d.educacion}</p>
-        </section>
-
-        <section>
-          <h3>Experiencia profesional</h3>
-          <p>${d.experiencia}</p>
-        </section>
-
-        <section>
-          <h3>Habilidades</h3>
-          <p>${d.habilidades}</p>
-        </section>
-
-        <section>
-          <h3>Certificaciones y cursos</h3>
-          <p>${d.cursos}</p>
-        </section>
-
-        <section>
-          <h3>Idiomas</h3>
-          <p>${d.idiomas}</p>
-        </section>
-      </article>
-    `;
   }
 
-  el('preview').innerHTML = content;
-  el('builder').hidden = true;
-  el('previewCard').hidden = false;
-  window.scrollTo(0,0);
+  return `
+    <article class="cv ats">
+      <div class="head">
+        <h2>${d.nombre}</h2>
+        <div class="contact">
+          ${d.telefono} · ${d.email} · ${d.ciudad}
+        </div>
+      </div>
+      <section><h3>Perfil profesional</h3><p>${d.perfil}</p></section>
+      <section><h3>Educación</h3><p>${d.educacion}</p></section>
+      <section><h3>Experiencia profesional</h3><p>${d.experiencia}</p></section>
+      <section><h3>Habilidades</h3><p>${d.habilidades}</p></section>
+      <section><h3>Certificaciones y cursos</h3><p>${d.cursos}</p></section>
+      <section><h3>Idiomas</h3><p>${d.idiomas}</p></section>
+    </article>
+  `;
 }
 
-function editCV(){
-  el('previewCard').hidden = true;
-  el('builder').hidden = false;
+function showExample() {
+  el("preview").innerHTML = renderCV(ejemplo,design);
+  showCard("previewCard");
+}
+
+function editCV() {
   current = steps.length - 1;
   update();
-  window.scrollTo(0,0);
+  showCard("builder");
 }
 
-async function testPayment(){
-  const button = el('testPaymentBtn');
+async function testPayment() {
+  const button = el("testPaymentBtn");
   button.disabled = true;
-  button.textContent = 'Preparando pago...';
+  button.textContent = "Preparando pago...";
 
-  try{
-    // Se envían los datos verdaderos al servidor.
-    // Nunca se colocan en el ejemplo público.
+  try {
     const datos_cv = {
-      nombre:val('nombre'),
-      telefono:val('telefono'),
-      email:val('email'),
-      ciudad:val('ciudad'),
-      perfil:val('perfil'),
-      experiencia:val('experiencia'),
-      educacion:val('educacion'),
-      cursos:val('cursos'),
-      habilidades:val('habilidades'),
-      idiomas:val('idiomas')
+      nombre:val("nombre"),
+      telefono:val("telefono"),
+      email:val("email"),
+      ciudad:val("ciudad"),
+      perfil:val("perfil"),
+      experiencia:val("experiencia"),
+      educacion:val("educacion"),
+      cursos:val("cursos"),
+      habilidades:val("habilidades"),
+      idiomas:val("idiomas")
     };
 
-    const response = await fetch('/api/crear-pago',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({
-        datos_cv,
-        diseno:design
-      })
+    const response = await fetch("/api/crear-pago",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({datos_cv,diseno:design})
     });
 
     const data = await response.json();
 
-    if(!response.ok){
-      throw new Error(
-        data.error || 'No se pudo preparar el pago'
-      );
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo preparar el pago");
     }
 
-    if(!data.checkoutUrl){
-      throw new Error(
-        'Mercado Pago no devolvió un enlace'
-      );
+    if (
+      typeof data.tokenDescarga !== "string" ||
+      !/^[a-f0-9]{64}$/.test(data.tokenDescarga)
+    ) {
+      throw new Error("No se recibió la clave de descarga");
     }
 
     const url = new URL(data.checkoutUrl);
+    const permitidos = ["mercadopago.com.ar","mercadopago.com"];
 
-    const permitidos = [
-      'mercadopago.com.ar',
-      'mercadopago.com'
-    ];
-
-    if(
-      url.protocol !== 'https:' ||
-      !permitidos.some(
-        dominio =>
-          url.hostname === dominio ||
-          url.hostname.endsWith('.' + dominio)
+    if (
+      url.protocol !== "https:" ||
+      !permitidos.some(domain =>
+        url.hostname === domain ||
+        url.hostname.endsWith("." + domain)
       )
-    ){
-      throw new Error(
-        'El enlace no pertenece a Mercado Pago'
-      );
+    ) {
+      throw new Error("El enlace no pertenece a Mercado Pago");
     }
+
+    // Guardar la clave en este navegador antes de ir a pagar.
+    sessionStorage.setItem("micvya_token_descarga",data.tokenDescarga);
 
     window.location.assign(url.href);
 
-  }catch(error){
-    alert('No se pudo abrir el pago: ' + error.message);
+  } catch (error) {
+    alert("No se pudo abrir el pago: " + error.message);
     button.disabled = false;
-    button.textContent = 'Pagar $5.000 y obtener mi CV';
+    button.textContent = "Pagar $5.000 y obtener mi CV";
   }
 }
+
+async function verifyPayment() {
+  const token = sessionStorage.getItem("micvya_token_descarga");
+
+  if (!token) {
+    showCard("welcome");
+    return;
+  }
+
+  showCard("paymentCard");
+  el("verifyBtn").disabled = true;
+  el("paymentMessage").textContent = "Consultando el estado del pago...";
+
+  try {
+    const response = await fetch("/api/verificar-cv",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      cache:"no-store",
+      body:JSON.stringify({tokenDescarga:token})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo verificar el pago");
+    }
+
+    if (!data.aprobado) {
+      el("paymentMessage").textContent =
+        "Tu currículum todavía figura pendiente. Si ya pagaste, esperá unos momentos y volvé a comprobar.";
+      return;
+    }
+
+    if (
+      !data.datos_cv ||
+      !["modern","ats"].includes(data.diseno)
+    ) {
+      throw new Error("Los datos del currículum están incompletos");
+    }
+
+    paidCV = {
+      datos_cv:data.datos_cv,
+      diseno:data.diseno
+    };
+
+    el("realPreview").innerHTML =
+      renderCV(paidCV.datos_cv,paidCV.diseno);
+
+    showCard("resultCard");
+
+  } catch (error) {
+    el("paymentMessage").textContent =
+      "No pudimos comprobar tu pago: " + error.message;
+  } finally {
+    el("verifyBtn").disabled = false;
+  }
+}
+
+function downloadCV() {
+  if (!paidCV) {
+    alert("Primero debemos verificar tu pago.");
+    return;
+  }
+
+  const printWindow = window.open("","_blank");
+
+  if (!printWindow) {
+    alert("Permití las ventanas emergentes para guardar tu CV.");
+    return;
+  }
+
+  const content = renderCV(paidCV.datos_cv,paidCV.diseno);
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!doctype html>
+    <html lang="es">
+    <head>
+      <meta charset="utf-8">
+      <title>Mi currículum - MiCVYa</title>
+      <style>
+        *{box-sizing:border-box}
+        @page{size:A4;margin:12mm}
+        body{margin:0;color:#111;font-family:Arial,sans-serif}
+        .cv{width:100%;font-family:Arial,sans-serif;line-height:1.4;overflow-wrap:anywhere}
+        .cv section{margin:0 0 15px;break-inside:avoid}
+        .cv p{font-size:10pt;line-height:1.5;white-space:pre-wrap;margin:0;color:#111}
+        .cv.modern{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);gap:20px}
+        .cv.modern h2{font-family:Georgia,serif;font-size:28pt;margin:0 0 25px}
+        .cv.modern h3{font-family:Georgia,serif;font-size:13pt;color:#2858a7;margin:0 0 8px}
+        .cv.modern .sidebox{border:1px solid #bbb;padding:15px;margin-bottom:15px;break-inside:avoid}
+        .cv.modern .sidebox p{border-bottom:1px solid #ddd;padding:6px 0}
+        .cv.modern .timeline{border-left:2px solid #ddd;padding-left:12px}
+        .cv.ats .head{text-align:center;border-bottom:1px solid #bbb;padding-bottom:15px;margin-bottom:20px}
+        .cv.ats h2{font-size:19pt;text-transform:uppercase;margin:0 0 5px}
+        .cv.ats .contact{font-size:9pt}
+        .cv.ats h3{font-size:11pt;text-transform:uppercase;margin:0 0 8px}
+        .cv.ats p{font-size:10pt}
+      </style>
+    </head>
+    <body>${content}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
+window.addEventListener("DOMContentLoaded",() => {
+  if (sessionStorage.getItem("micvya_token_descarga")) {
+    verifyPayment();
+  }
+});
 </script>
 </body>
 </html>
