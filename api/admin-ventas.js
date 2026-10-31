@@ -1,9 +1,146 @@
 
 const PRECIO_CV = 5000;
 
-export default async function handler(req, res) {
+const LIMITE_SOLICITUDES = 1000;
+
+function configurarRespuesta(res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
+}
+
+async function obtenerUsuario(url, key, token) {
+  const respuesta = await fetch(
+    `${url}/auth/v1/user`,
+    {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!respuesta.ok) {
+    return null;
+  }
+
+  const usuario = await respuesta.json();
+
+  return usuario?.id ? usuario : null;
+}
+
+async function esAdministrador(url, key, usuarioId) {
+  const consulta = new URL(
+    "/rest/v1/administradores",
+    url
+  );
+
+  consulta.searchParams.set(
+    "usuario_id",
+    `eq.${usuarioId}`
+  );
+
+  consulta.searchParams.set(
+    "select",
+    "usuario_id"
+  );
+
+  consulta.searchParams.set("limit", "1");
+
+  const respuesta = await fetch(consulta, {
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json"
+    }
+  });
+
+  if (!respuesta.ok) {
+    throw new Error(
+      "No se pudo comprobar el administrador"
+    );
+  }
+
+  const registros = await respuesta.json();
+
+  return (
+    Array.isArray(registros) &&
+    registros.length === 1
+  );
+}
+
+async function obtenerVentas(url, key) {
+  const consulta = new URL(
+    "/rest/v1/solicitudes_cv",
+    url
+  );
+
+  consulta.searchParams.set(
+    "select",
+    "id,diseno,estado_pago,creado_en,pagado_en"
+  );
+
+  consulta.searchParams.set(
+    "order",
+    "creado_en.desc"
+  );
+
+  consulta.searchParams.set(
+    "limit",
+    String(LIMITE_SOLICITUDES)
+  );
+
+  const respuesta = await fetch(consulta, {
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      Accept: "application/json"
+    }
+  });
+
+  if (!respuesta.ok) {
+    throw new Error(
+      "No se pudieron consultar las ventas"
+    );
+  }
+
+  const ventas = await respuesta.json();
+
+  if (!Array.isArray(ventas)) {
+    throw new Error("Respuesta de ventas inválida");
+  }
+
+  const aprobadas = ventas.filter(
+    venta => venta.estado_pago === "aprobado"
+  ).length;
+
+  const pendientes = ventas.filter(
+    venta => venta.estado_pago === "pendiente"
+  ).length;
+
+  return {
+    aprobadas,
+    pendientes,
+    total: ventas.length,
+    recaudacion: aprobadas * PRECIO_CV,
+    limitado: ventas.length === LIMITE_SOLICITUDES,
+    ventas: ventas.slice(0, 50).map(venta => ({
+      id: venta.id,
+      diseno: venta.diseno,
+      estado: venta.estado_pago,
+      fecha:
+        venta.pagado_en ||
+        venta.creado_en ||
+        null,
+      importe:
+        venta.estado_pago === "aprobado"
+          ? PRECIO_CV
+          : 0
+    }))
+  };
+}
+
+export default async function handler(req, res) {
+  configurarRespuesta(res);
 
   if (!["GET", "POST"].includes(req.method)) {
     return res.status(405).json({
@@ -24,21 +161,14 @@ export default async function handler(req, res) {
     });
   }
 
-  const headers = {
-    apikey: supabaseKey,
-    Authorization: `Bearer ${supabaseKey}`,
-    Accept: "application/json"
-  };
-
   try {
-    // Iniciar sesión con Supabase Auth.
     if (req.method === "POST") {
       const { email, password } = req.body || {};
 
       if (
         typeof email !== "string" ||
         typeof password !== "string" ||
-        !email ||
+        !email.trim() ||
         !password ||
         email.length > 254 ||
         password.length > 1024
@@ -48,7 +178,7 @@ export default async function handler(req, res) {
         });
       }
 
-      const loginResponse = await fetch(
+      const respuestaLogin = await fetch(
         `${supabaseUrl}/auth/v1/token?grant_type=password`,
         {
           method: "POST",
@@ -56,195 +186,106 @@ export default async function handler(req, res) {
             apikey: supabaseKey,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({
+            email: email.trim(),
+            password
+          })
         }
       );
 
-      if (!loginResponse.ok) {
+      if (!respuestaLogin.ok) {
         return res.status(401).json({
           error: "Correo o contraseña incorrectos"
         });
       }
 
-      const session = await loginResponse.json();
+      const sesion = await respuestaLogin.json();
 
-      if (!session.access_token) {
+      if (!sesion.access_token) {
         return res.status(502).json({
           error: "No se pudo iniciar sesión"
         });
       }
 
-      const userResponse = await fetch(
-        `${supabaseUrl}/auth/v1/user`,
-        {
-          headers: {
-            apikey: supabaseKey,
-            Authorization: `Bearer ${session.access_token}`
-          }
-        }
+      const usuario = await obtenerUsuario(
+        supabaseUrl,
+        supabaseKey,
+        sesion.access_token
       );
 
-      if (!userResponse.ok) {
+      if (!usuario) {
         return res.status(401).json({
-          error: "Sesión inválida"
+          error: "No se pudo validar tu sesión"
         });
       }
 
-      const user = await userResponse.json();
-
-      const adminUrl = new URL(
-        "/rest/v1/administradores",
-        supabaseUrl
+      const autorizado = await esAdministrador(
+        supabaseUrl,
+        supabaseKey,
+        usuario.id
       );
 
-      adminUrl.searchParams.set(
-        "usuario_id",
-        `eq.${user.id}`
-      );
-
-      adminUrl.searchParams.set(
-        "select",
-        "usuario_id"
-      );
-
-      const adminResponse = await fetch(adminUrl, {
-        headers
-      });
-
-      if (!adminResponse.ok) {
-        throw new Error("No se pudo verificar el administrador");
-      }
-
-      const admins = await adminResponse.json();
-
-      if (admins.length !== 1) {
+      if (!autorizado) {
         return res.status(403).json({
           error: "No tenés permisos de administrador"
         });
       }
 
       return res.status(200).json({
-        access_token: session.access_token,
-        expires_in: session.expires_in
+        access_token: sesion.access_token,
+        expires_in: sesion.expires_in
       });
     }
 
-    // Comprobar la sesión en cada consulta.
-    const authorization = req.headers.authorization || "";
+    const authorization =
+      req.headers.authorization || "";
 
-    if (!/^Bearer \S+$/.test(authorization)) {
+    const coincidencia = /^Bearer (\S+)$/.exec(
+      authorization
+    );
+
+    if (!coincidencia) {
       return res.status(401).json({
         error: "Tenés que iniciar sesión"
       });
     }
 
-    const userResponse = await fetch(
-      `${supabaseUrl}/auth/v1/user`,
-      {
-        headers: {
-          apikey: supabaseKey,
-          Authorization: authorization
-        }
-      }
+    const usuario = await obtenerUsuario(
+      supabaseUrl,
+      supabaseKey,
+      coincidencia[1]
     );
 
-    if (!userResponse.ok) {
+    if (!usuario) {
       return res.status(401).json({
-        error: "La sesión venció. Ingresá nuevamente."
+        error: "Tu sesión venció. Ingresá nuevamente."
       });
     }
 
-    const user = await userResponse.json();
-
-    // Verificar que siga siendo administrador.
-    const adminUrl = new URL(
-      "/rest/v1/administradores",
-      supabaseUrl
+    const autorizado = await esAdministrador(
+      supabaseUrl,
+      supabaseKey,
+      usuario.id
     );
 
-    adminUrl.searchParams.set(
-      "usuario_id",
-      `eq.${user.id}`
-    );
-
-    adminUrl.searchParams.set(
-      "select",
-      "usuario_id"
-    );
-
-    const adminResponse = await fetch(adminUrl, {
-      headers
-    });
-
-    if (!adminResponse.ok) {
-      throw new Error("Error verificando permisos");
-    }
-
-    const admins = await adminResponse.json();
-
-    if (admins.length !== 1) {
+    if (!autorizado) {
       return res.status(403).json({
         error: "Acceso denegado"
       });
     }
 
-    // Consultar solamente datos necesarios.
-    const ventasUrl = new URL(
-      "/rest/v1/solicitudes_cv",
-      supabaseUrl
+    const resumen = await obtenerVentas(
+      supabaseUrl,
+      supabaseKey
     );
 
-    ventasUrl.searchParams.set(
-      "select",
-      "id,diseno,estado_pago,creado_en,pagado_en"
-    );
-
-    ventasUrl.searchParams.set(
-      "order",
-      "creado_en.desc"
-    );
-
-    // Primera versión: máximo 1000 solicitudes.
-    ventasUrl.searchParams.set("limit", "1000");
-
-    const ventasResponse = await fetch(ventasUrl, {
-      headers
-    });
-
-    if (!ventasResponse.ok) {
-      throw new Error("Error consultando las ventas");
-    }
-
-    const ventas = await ventasResponse.json();
-
-    const aprobadas = ventas.filter(
-      venta => venta.estado_pago === "aprobado"
-    ).length;
-
-    const pendientes = ventas.filter(
-      venta => venta.estado_pago === "pendiente"
-    ).length;
-
-    return res.status(200).json({
-      aprobadas,
-      pendientes,
-      total: ventas.length,
-      recaudacion: aprobadas * PRECIO_CV,
-      ventas: ventas.slice(0, 50).map(venta => ({
-        id: venta.id,
-        diseno: venta.diseno,
-        estado: venta.estado_pago,
-        fecha: venta.pagado_en || venta.creado_en,
-        importe:
-          venta.estado_pago === "aprobado"
-            ? PRECIO_CV
-            : 0
-      })),
-      limitado: ventas.length === 1000
-    });
+    return res.status(200).json(resumen);
 
   } catch (error) {
-    console.error("Error en administración:", error);
+    console.error(
+      "Error en panel administrador:",
+      error
+    );
 
     return res.status(500).json({
       error: "No se pudo procesar la solicitud"
