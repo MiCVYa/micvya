@@ -10,6 +10,17 @@
 body{margin:0;font:16px Arial,sans-serif;background:#f4f6fb;color:#20263a}
 header{background:#172554;color:white;padding:22px 7%;font-size:25px;font-weight:bold}
 header span{color:#60a5fa}
+header .brand{background:none;color:inherit;border:0;padding:0;font-size:inherit;font-weight:inherit}
+.price{font-size:30px;font-weight:800;color:#172554;margin:20px 0 4px}
+.price-note{margin:0 0 16px;font-size:14px}
+.choice small{display:block;font-size:12px;line-height:1.5;font-weight:normal;margin-top:8px;color:#475569}
+.modal-overlay{position:fixed;inset:0;background:#0f172ab3;display:grid;place-items:center;padding:16px;z-index:10}
+.modal-box{background:white;border-radius:16px;padding:24px;max-width:430px;width:100%;box-shadow:0 12px 50px #0004}
+.modal-box h2{margin-top:0}
+footer details{max-width:850px;margin:10px auto;text-align:left;border:1px solid #cbd5e1;border-radius:9px;padding:12px 16px;background:white}
+footer summary{cursor:pointer;font-weight:bold;color:#1e293b}
+footer details p{font-size:13px}
+footer .footer-note{max-width:850px;margin:16px auto}
 main{max-width:850px;margin:38px auto;padding:0 18px}
 .card{background:white;border-radius:18px;padding:30px;box-shadow:0 8px 30px #17255412;margin-bottom:24px}
 h1{font-size:32px}
@@ -61,13 +72,15 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 </head>
 <body>
 
-<header>MiCV<span>Ya</span></header>
+<header><button type="button" class="brand" onclick="requestHome()" aria-label="MiCVYa, volver al inicio">MiCV<span>Ya</span></button></header>
 
 <main>
 <div class="card" id="welcome">
 <h1>¿Nunca hiciste un currículum? No importa. Nosotros te guiamos.</h1>
 <p>Respondé unas preguntas sencillas y prepará tu CV paso a paso.</p>
-<button class="primary" onclick="start()">EMPEZAR MI CV</button>
+<div class="price">$5.000 ARS</div>
+<p class="price-note">Pago único · Sin suscripciones · Pagás mediante Mercado Pago al finalizar</p>
+<button class="primary" onclick="start()">Comenzar a crear mi CV</button>
 </div>
 
 <div class="card" id="builder" hidden>
@@ -84,13 +97,13 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <label>Correo electrónico</label>
 <input id="email" type="email" autocomplete="email" placeholder="Ej: juan@gmail.com">
 <label>Localidad y provincia</label>
-<input id="ciudad" placeholder="Ej: Cipolletti, Río Negro">
+<input id="ciudad" placeholder="Ej: La Plata, Buenos Aires">
 </section>
 
 <section class="step">
 <h2>Contanos algo sobre vos</h2>
 <label>Breve presentación personal</label>
-<textarea id="perfil" placeholder="Ej: Soy responsable y tengo ganas de aprender."></textarea>
+<textarea id="perfil" placeholder="Contanos cómo sos trabajando, qué habilidades tenés, qué podés aportar a una empresa y si contás con movilidad propia o flexibilidad de horarios."></textarea>
 </section>
 
 <section class="step">
@@ -120,7 +133,7 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <h2>Elegí tu diseño</h2>
 <div class="choices">
 <button type="button" class="choice selected" id="modernBtn" onclick="choose('modern')">Moderno con foto opcional</button>
-<button type="button" class="choice" id="atsBtn" onclick="choose('ats')">Simple compatible con ATS (sin foto)</button>
+<button type="button" class="choice" id="atsBtn" onclick="choose('ats')">Simple compatible con filtro ATS (sin foto)<small>Diseño limpio y profesional, pensado para facilitar la lectura por sistemas de selección de personal.</small></button>
 </div>
 <div id="photoFields">
 <label>Foto (opcional, hasta 5 MB)</label>
@@ -169,7 +182,17 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 </div>
 </main>
 
-<footer>MiCVYa © 2026</footer>
+<footer>
+  <details><summary>Quiénes somos</summary><p>MiCVYa es una plataforma argentina creada para ayudar a las personas a elaborar su currículum de manera rápida, sencilla y profesional. Nuestro objetivo es que cualquier persona pueda presentar su experiencia laboral, estudios y habilidades de forma clara y organizada, sin necesitar conocimientos de diseño. Ofrecemos modelos de currículum en PDF, listos para descargar y utilizar en búsquedas laborales.</p></details>
+  <details><summary>Información comercial</summary><p>Nombre comercial: MiCVYa. Servicio digital de elaboración de currículums en PDF. Precio: $5.000 ARS por currículum, pago único mediante Mercado Pago. Antes de habilitar ventas reales se completarán los datos legales y fiscales del prestador.</p></details>
+  <details><summary>Ayuda y soporte</summary><p>Los canales de WhatsApp Business y correo de soporte se publicarán cuando estén habilitados. Si ya realizaste un pago de prueba, conservá este navegador y no vuelvas a pagar ante una demora.</p></details>
+  <details><summary>Privacidad y condiciones</summary><p>Los datos ingresados se utilizan para preparar el currículum. Si adjuntás una foto, se procesa mediante almacenamiento privado. El servicio no garantiza conseguir empleo. Antes de recibir pagos reales se publicará la política completa de privacidad, conservación de datos y condiciones de contratación.</p></details>
+  <details><summary>Arrepentimiento y devoluciones</summary><p>Antes del lanzamiento comercial se habilitará un canal de solicitudes y el mecanismo de arrepentimiento que corresponda conforme a la normativa aplicable.</p></details>
+  <p class="footer-note">MiCVYa © 2026 · Versión de pruebas. No habilitar cobros reales hasta completar la información comercial y legal.</p>
+</footer>
+<div class="modal-overlay" id="homeModal" hidden role="dialog" aria-modal="true" aria-labelledby="homeTitle">
+ <div class="modal-box"><h2 id="homeTitle">¿Querés volver al inicio?</h2><p>Ya comenzaste a completar tu currículum. Si salís, podrías perder los datos ingresados.</p><div class="actions"><button class="secondary" type="button" onclick="closeHomeModal()">Seguir editando</button><button class="primary" type="button" onclick="goHome()">Volver al inicio</button></div></div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -188,6 +211,25 @@ function showCard(id) {
   ["welcome","builder","previewCard","paymentCard","resultCard"]
     .forEach(name => el(name).hidden = name !== id);
   window.scrollTo(0,0);
+}
+
+function requestHome() {
+  if (!el("welcome").hidden && !el("homeModal").hidden) return;
+  if (!el("welcome").hidden) return;
+  if (!el("paymentCard").hidden || !el("resultCard").hidden) {
+    alert("Tu compra está en proceso o ya fue confirmada. Para proteger el acceso a tu CV, permanecé en esta pantalla.");
+    return;
+  }
+  el("homeModal").hidden = false;
+}
+
+function closeHomeModal() {
+  el("homeModal").hidden = true;
+}
+
+function goHome() {
+  closeHomeModal();
+  showCard("welcome");
 }
 
 function start() {
@@ -383,6 +425,16 @@ function escapeHTML(value) {
   );
 }
 
+function formatoBasico(valor) {
+  return String(valor ?? "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(linea => linea.replace(/[ \t]+/g," ").trim())
+    .filter((linea, i, arr) => linea || (i > 0 && arr[i-1]))
+    .join("\n")
+    .trim();
+}
+
 function renderCV(data,selectedDesign,foto = "") {
   const d = {};
 
@@ -393,7 +445,7 @@ function renderCV(data,selectedDesign,foto = "") {
   ];
 
   for (const field of fields) {
-    d[field] = escapeHTML(data[field]);
+    d[field] = escapeHTML(formatoBasico(data[field]));
   }
 
   if (selectedDesign === "modern") {
@@ -946,7 +998,6 @@ function nombreArchivoCV(nombre) {
   return "CV_" + (limpio || "Curriculum") + ".pdf";
 }
 
-// PDF con distribución y detalles visuales equivalentes a la vista previa.
 function crearEscritorPDF(pdf) {
   const limite = 281;
   const estado = {
@@ -1210,111 +1261,55 @@ async function generarPDFModerno(pdf,datos,foto) {
 
   function recuadro(titulo,contenido,contacto=false) {
     const partes = contacto
-      ? [
-          datos.telefono,
-          datos.email,
-          datos.ciudad
-        ].filter(v=>String(v || "").trim())
-      : [contenido];
+      ? [datos.telefono,datos.email,datos.ciudad].filter(v=>String(v || "").trim())
+      : [contenido].filter(v=>String(v || "").trim());
+    if (!partes.length) return;
 
-    if (!contacto && !String(contenido || "").trim()) {
+    const padding=5.5, interno=sideW-2*padding;
+    const altoLinea=9*0.3528*1.45;
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(9);
+    const bloques=partes.map(v=>String(v).replace(/\r/g,"").split("\n")
+      .flatMap(linea=>pdf.splitTextToSize(linea||" ",interno)));
+    const altoTitulo=15;
+    const altoContenido=bloques.reduce((sum,lineas)=>sum+lineas.length*altoLinea+5,0);
+    const alto=Math.max(25,padding+altoTitulo+altoContenido+padding);
+    if (alto > 240) {
+      w.titulo(titulo,"lateral",sideX+padding,interno,{tamano:14});
+      partes.forEach(v=>w.texto(v,"lateral",sideX+padding,interno,{tamano:9,despues:5}));
       return;
     }
 
-    const padding = 5.5;
-    const interno = sideW-2*padding;
-    const altoLinea = 9*0.3528*1.45;
-
-    pdf.setFont("helvetica","normal");
-    pdf.setFontSize(9);
-
-    const alturas = partes.map(v =>
-      String(v)
-        .replace(/\r/g,"")
-        .split("\n")
-        .reduce(
-          (a,line) =>
-            a+pdf.splitTextToSize(
-              line || " ",
-              interno
-            ).length*altoLinea,
-          0
-        )
-    );
-
-    const alto = Math.max(
-      26,
-      12+
-      alturas.reduce((a,b)=>a+b,0)+
-      (contacto ? partes.length*6 : 8)+
-      padding*2
-    );
-
-    const s = w.espacio(
-      "lateral",
-      Math.min(alto,260)
-    );
-
-    const y = s.y;
-    const numero = s.pagina;
-
+    const s=w.espacio("lateral",Math.min(alto,260));
+    const inicioY=s.y;
+    const paginaInicio=s.pagina;
     pdf.setDrawColor(185,185,185);
     pdf.setLineWidth(0.3);
-    pdf.rect(
-      sideX,
-      y,
-      sideW,
-      Math.min(alto,260)
-    );
-
-    s.y += 9;
-
-    w.titulo(
-      titulo,
-      "lateral",
-      sideX+padding,
-      interno,
-      {tamano:14}
-    );
-
-    for (let i=0;i<partes.length;i++) {
-      w.texto(
-        partes[i],
-        "lateral",
-        sideX+padding,
-        interno,
-        {
-          tamano:9,
-          despues:contacto ? 3 : 4,
-          color:[24,24,24]
-        }
-      );
-
-      if (contacto) {
-        const lineaY = w.estado.lateral.y;
-        w.pagina(w.estado.lateral.pagina);
-
+    pdf.rect(sideX,inicioY,sideW,Math.min(alto,260));
+    let y=inicioY+padding+5;
+    pdf.setFont("times","bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(40,88,167);
+    pdf.text(titulo,sideX+padding,y);
+    y=inicioY+padding+altoTitulo;
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(24,24,24);
+    bloques.forEach((lineas,indice)=>{
+      lineas.forEach(linea=>{
+        pdf.text(linea,sideX+padding,y);
+        y+=altoLinea;
+      });
+      if(contacto && indice<bloques.length-1){
+        y+=1.5;
         pdf.setDrawColor(215,215,215);
         pdf.setLineWidth(0.22);
-        pdf.line(
-          sideX+padding,
-          lineaY,
-          sideX+sideW-padding,
-          lineaY
-        );
-
-        w.estado.lateral.y += 4;
-      }
-    }
-
-    if (w.estado.lateral.pagina===numero) {
-      w.estado.lateral.y = Math.max(
-        w.estado.lateral.y,
-        y+alto+6
-      );
-    } else {
-      w.estado.lateral.y += 6;
-    }
+        pdf.line(sideX+padding,y,sideX+sideW-padding,y);
+        y+=3.5;
+      } else y+=5;
+    });
+    w.estado.lateral.pagina=paginaInicio;
+    w.estado.lateral.y=Math.max(y+padding,inicioY+alto+6);
   }
 
   recuadro("Contacto","",true);
@@ -1415,7 +1410,11 @@ async function downloadCV() {
 
   try {
     const pdf = crearDocumentoPDF();
-    const datos = paidCV.datos_cv;
+    const datos = Object.fromEntries(
+      Object.entries(paidCV.datos_cv).map(([clave,valor]) =>
+        [clave, typeof valor === "string" && clave !== "foto_path" ? formatoBasico(valor) : valor]
+      )
+    );
 
     if (paidCV.diseno === "modern") {
       await generarPDFModerno(
