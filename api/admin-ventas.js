@@ -1,11 +1,27 @@
 
 const PRECIO_CV = 5000;
-
 const LIMITE_SOLICITUDES = 1000;
 
 function configurarRespuesta(res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
+}
+
+// Compatible con claves nuevas de Supabase
+// y con la clave antigua service_role.
+function cabecerasBaseDatos(key) {
+  const headers = {
+    apikey: key,
+    Accept: "application/json"
+  };
+
+  // Las claves nuevas sb_secret_ no son JWT.
+  // Nunca deben enviarse como Bearer.
+  if (!key.startsWith("sb_")) {
+    headers.Authorization = `Bearer ${key}`;
+  }
+
+  return headers;
 }
 
 async function obtenerUsuario(url, key, token) {
@@ -20,6 +36,10 @@ async function obtenerUsuario(url, key, token) {
   );
 
   if (!respuesta.ok) {
+    console.error(
+      "Error validando usuario:",
+      respuesta.status
+    );
     return null;
   }
 
@@ -47,14 +67,15 @@ async function esAdministrador(url, key, usuarioId) {
   consulta.searchParams.set("limit", "1");
 
   const respuesta = await fetch(consulta, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: "application/json"
-    }
+    headers: cabecerasBaseDatos(key)
   });
 
   if (!respuesta.ok) {
+    console.error(
+      "Error comprobando administrador:",
+      respuesta.status
+    );
+
     throw new Error(
       "No se pudo comprobar el administrador"
     );
@@ -90,14 +111,15 @@ async function obtenerVentas(url, key) {
   );
 
   const respuesta = await fetch(consulta, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: "application/json"
-    }
+    headers: cabecerasBaseDatos(key)
   });
 
   if (!respuesta.ok) {
+    console.error(
+      "Error consultando ventas:",
+      respuesta.status
+    );
+
     throw new Error(
       "No se pudieron consultar las ventas"
     );
@@ -194,19 +216,23 @@ export default async function handler(req, res) {
       );
 
       if (!respuestaLogin.ok) {
-        const detalle = await respuestaLogin.text();
-
-        // Diagnóstico temporal.
-        // No registrar contraseñas ni tokens.
         console.error(
           "Error de autenticación Supabase:",
-          respuestaLogin.status,
-          detalle
+          respuestaLogin.status
         );
 
-        return res.status(401).json({
+        if (
+          respuestaLogin.status === 400 ||
+          respuestaLogin.status === 401
+        ) {
+          return res.status(401).json({
+            error: "Correo o contraseña incorrectos"
+          });
+        }
+
+        return res.status(502).json({
           error:
-            "No se pudo iniciar sesión. Revisá el registro del servidor."
+            "No se pudo conectar con el servicio de inicio de sesión"
         });
       }
 
