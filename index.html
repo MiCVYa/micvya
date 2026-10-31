@@ -406,8 +406,8 @@ async function testPayment() {
       throw new Error("El enlace no pertenece a Mercado Pago");
     }
 
-    // Guardar la clave en este navegador antes de ir a pagar.
-    sessionStorage.setItem("micvya_token_descarga",data.tokenDescarga);
+    // Conservamos la clave aunque se cierre la pestaña.
+    localStorage.setItem("micvya_token_descarga",data.tokenDescarga);
 
     window.location.assign(url.href);
 
@@ -419,16 +419,21 @@ async function testPayment() {
 }
 
 async function verifyPayment() {
-  const token = sessionStorage.getItem("micvya_token_descarga");
+  const token = localStorage.getItem("micvya_token_descarga");
 
   if (!token) {
-    showCard("welcome");
+    showCard("paymentCard");
+    el("paymentMessage").textContent =
+      "No encontramos la clave de recuperación en este navegador. Si pagaste desde otro dispositivo o navegador, no vuelvas a pagar. Estamos preparando la recuperación por correo electrónico.";
+    el("verifyBtn").hidden = true;
     return;
   }
 
+  el("verifyBtn").hidden = false;
   showCard("paymentCard");
   el("verifyBtn").disabled = true;
-  el("paymentMessage").textContent = "Consultando el estado del pago...";
+  el("paymentMessage").textContent =
+    "Consultando el estado del pago...";
 
   try {
     const response = await fetch("/api/verificar-cv",{
@@ -520,14 +525,23 @@ function downloadCV() {
     <body>${content}</body>
     </html>
   `);
+
   printWindow.document.close();
   printWindow.focus();
   printWindow.print();
 }
 
 window.addEventListener("DOMContentLoaded",() => {
-  if (sessionStorage.getItem("micvya_token_descarga")) {
+  if (localStorage.getItem("micvya_token_descarga")) {
     verifyPayment();
+  } else if (
+    new URLSearchParams(window.location.search).has("collection_id") ||
+    new URLSearchParams(window.location.search).has("status")
+  ) {
+    showCard("paymentCard");
+    el("paymentMessage").textContent =
+      "Volviste de Mercado Pago, pero no encontramos tu clave en este navegador. No pagues otra vez. Estamos preparando la recuperación por correo electrónico.";
+    el("verifyBtn").hidden = true;
   }
 });
 </script>
