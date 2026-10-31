@@ -171,7 +171,6 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 
 <footer>MiCVYa © 2026</footer>
 
-<!-- CORRECCIÓN: versión disponible de jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
@@ -947,255 +946,185 @@ function nombreArchivoCV(nombre) {
   return "CV_" + (limpio || "Curriculum") + ".pdf";
 }
 
+// PDF con distribución y detalles visuales equivalentes a la vista previa.
 function crearEscritorPDF(pdf) {
-  const altoPagina = 297;
-  const margenInferior = 16;
-
-  const posiciones = {
-    principal:{pagina:1,y:20},
-    lateral:{pagina:1,y:20},
+  const limite = 281;
+  const estado = {
+    principal:{pagina:1,y:17},
+    lateral:{pagina:1,y:17},
     unica:{pagina:1,y:20}
   };
 
-  function asegurarPagina(numero) {
-    while (pdf.getNumberOfPages() < numero) {
+  function pagina(n) {
+    while (pdf.getNumberOfPages() < n) {
       pdf.addPage();
     }
-
-    pdf.setPage(numero);
+    pdf.setPage(n);
   }
 
-  function espacio(columna,altoNecesario) {
-    const estado = posiciones[columna];
-
-    if (
-      estado.y + altoNecesario >
-      altoPagina - margenInferior
-    ) {
-      estado.pagina++;
-      estado.y = 20;
+  function espacio(col,alto) {
+    const s = estado[col];
+    if (s.y + alto > limite) {
+      s.pagina++;
+      s.y = 18;
     }
-
-    asegurarPagina(estado.pagina);
-    return estado;
+    pagina(s.pagina);
+    return s;
   }
 
-  function texto(
-    contenido,
-    columna,
-    x,
-    ancho,
-    opciones = {}
-  ) {
-    const valor = String(contenido ?? "").trim();
-
+  function texto(valor,col,x,ancho,opt={}) {
+    valor = String(valor ?? "").trim();
     if (!valor) return;
 
-    const tamano = opciones.tamano || 10;
-    const interlineado = opciones.interlineado || 1.45;
-    const estilo = opciones.negrita ? "bold" : "normal";
-    const color = opciones.color || [25,30,42];
-    const alineacion = opciones.alineacion || "left";
+    const size = opt.tamano || 10;
+    const leading = opt.interlineado || 1.48;
+    const lh = size * 0.3528 * leading;
+    const font = opt.fuente || "helvetica";
+    const style = opt.negrita ? "bold" : "normal";
+    const color = opt.color || [25,30,42];
 
-    pdf.setFont("helvetica",estilo);
-    pdf.setFontSize(tamano);
-    pdf.setTextColor(...color);
+    pdf.setFont(font,style);
+    pdf.setFontSize(size);
 
-    const bloques = valor.replace(/\r/g,"").split("\n");
-    const alturaLinea = tamano * 0.3528 * interlineado;
-
-    for (const bloque of bloques) {
+    for (const parrafo of valor.replace(/\r/g,"").split("\n")) {
       const lineas = pdf.splitTextToSize(
-        bloque || " ",
+        parrafo || " ",
         ancho
       );
 
       for (const linea of lineas) {
-        const estado = espacio(
-          columna,
-          alturaLinea + 1
-        );
+        const s = espacio(col,lh+1);
 
-        pdf.setFont("helvetica",estilo);
-        pdf.setFontSize(tamano);
+        pdf.setFont(font,style);
+        pdf.setFontSize(size);
         pdf.setTextColor(...color);
 
         pdf.text(
           linea,
-          alineacion === "center" ? x + ancho / 2 : x,
-          estado.y,
-          {align:alineacion}
+          opt.centrado ? x+ancho/2 : x,
+          s.y,
+          {align:opt.centrado ? "center" : "left"}
         );
 
-        estado.y += alturaLinea;
+        s.y += lh;
       }
     }
 
-    posiciones[columna].y += opciones.despues ?? 3;
+    estado[col].y += opt.despues ?? 3;
   }
 
-  function titulo(
-    contenido,
-    columna,
-    x,
-    ancho,
-    opciones = {}
-  ) {
-    espacio(columna,12);
-
-    texto(
-      contenido,
-      columna,
-      x,
-      ancho,
-      {
-        tamano:opciones.tamano || 13,
-        negrita:true,
-        color:opciones.color || [40,88,167],
-        interlineado:1.2,
-        despues:4
-      }
-    );
+  function titulo(valor,col,x,ancho,opt={}) {
+    espacio(col,9);
+    texto(valor,col,x,ancho,{
+      tamano:opt.tamano || 14,
+      fuente:opt.fuente || "times",
+      negrita:true,
+      color:opt.color || [40,88,167],
+      interlineado:1.2,
+      despues:5
+    });
   }
 
-  function separacion(columna,mm) {
-    posiciones[columna].y += mm;
+  function seccion(t,v,col,x,ancho,opt={}) {
+    if (!String(v ?? "").trim()) return;
+
+    titulo(t,col,x,ancho,opt);
+
+    texto(v,col,x,ancho,{
+      tamano:opt.textoTamano || 9.5,
+      despues:9,
+      color:[24,24,24]
+    });
   }
 
-  function linea(columna,x,ancho) {
-    const estado = espacio(columna,3);
-
-    pdf.setDrawColor(195,200,210);
-    pdf.setLineWidth(0.3);
-    pdf.line(
-      x,
-      estado.y,
-      x + ancho,
-      estado.y
-    );
-
-    estado.y += 5;
-  }
-
-  function seccion(
-    encabezado,
-    contenido,
-    columna,
-    x,
-    ancho,
-    opciones = {}
-  ) {
-    const valor = String(contenido ?? "").trim();
-
-    if (!valor) return;
-
-    titulo(
-      encabezado,
-      columna,
-      x,
-      ancho,
-      opciones
-    );
-
-    texto(
-      valor,
-      columna,
-      x,
-      ancho,
-      {
-        tamano:opciones.textoTamano || 10,
-        despues:7
-      }
-    );
+  function linea(col,x,ancho) {
+    const s = espacio(col,3);
+    pdf.setDrawColor(210,210,210);
+    pdf.setLineWidth(0.25);
+    pdf.line(x,s.y,x+ancho,s.y);
+    s.y += 5;
   }
 
   return {
-    posiciones,
-    asegurarPagina,
+    estado,
+    pagina,
     espacio,
     texto,
     titulo,
-    separacion,
-    linea,
-    seccion
+    seccion,
+    linea
   };
 }
 
 async function prepararFotoPDF(dataUrl) {
   if (!dataUrl) return "";
 
-  const imagen = new Image();
+  const img = new Image();
 
-  await new Promise((resolve,reject) => {
-    imagen.onload = resolve;
-    imagen.onerror = () => reject(
-      new Error("No se pudo preparar la foto para el PDF")
+  await new Promise((ok,fail) => {
+    img.onload = ok;
+    img.onerror = () => fail(
+      new Error("No se pudo preparar la foto")
     );
-    imagen.src = dataUrl;
+    img.src = dataUrl;
   });
 
-  if (!imagen.naturalWidth || !imagen.naturalHeight) {
-    throw new Error("La foto no tiene dimensiones válidas");
-  }
-
-  const anchoFinal = 480;
-  const altoFinal = 480;
-
   const canvas = document.createElement("canvas");
-  canvas.width = anchoFinal;
-  canvas.height = altoFinal;
+  canvas.width = 600;
+  canvas.height = 470;
 
-  const contexto = canvas.getContext("2d");
-
-  if (!contexto) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
     throw new Error("No se pudo procesar la foto");
   }
 
-  const origenAncho = imagen.naturalWidth;
-  const origenAlto = imagen.naturalHeight;
+  const iw = img.naturalWidth;
+  const ih = img.naturalHeight;
+  const ratio = 600/470;
 
-  const lado = Math.min(origenAncho,origenAlto);
+  let sw = iw;
+  let sh = ih;
+  let sx = 0;
+  let sy = 0;
 
-  const sx = (origenAncho - lado) / 2;
-  const sy = Math.max(
-    0,
-    Math.min(
-      origenAlto - lado,
-      (origenAlto - lado) * 0.25
-    )
+  if (iw/ih > ratio) {
+    sw = ih*ratio;
+    sx = (iw-sw)/2;
+  } else {
+    sh = iw/ratio;
+    sy = (ih-sh)*0.25;
+  }
+
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,600,470);
+  ctx.drawImage(
+    img,
+    sx,sy,sw,sh,
+    0,0,600,470
   );
 
-  contexto.fillStyle = "#ffffff";
-  contexto.fillRect(0,0,anchoFinal,altoFinal);
-
-  contexto.drawImage(
-    imagen,
-    sx,sy,lado,lado,
-    0,0,anchoFinal,altoFinal
-  );
-
-  return canvas.toDataURL("image/jpeg",0.88);
+  return canvas.toDataURL("image/jpeg",0.9);
 }
 
 async function generarPDFModerno(pdf,datos,foto) {
   const w = crearEscritorPDF(pdf);
-
-  const xPrincipal = 18;
-  const anchoPrincipal = 105;
-  const xLateral = 139;
-  const anchoLateral = 53;
+  const x = 17;
+  const ancho = 109;
+  const sideX = 135;
+  const sideW = 60;
 
   w.texto(
     datos.nombre || "Currículum",
     "principal",
-    xPrincipal,
-    anchoPrincipal,
+    x,
+    ancho,
     {
-      tamano:23,
+      tamano:28,
+      fuente:"times",
       negrita:true,
-      color:[30,40,65],
-      interlineado:1.12,
-      despues:12
+      color:[20,20,20],
+      interlineado:1.1,
+      despues:13
     }
   );
 
@@ -1203,112 +1132,198 @@ async function generarPDFModerno(pdf,datos,foto) {
     "Resumen Profesional",
     datos.perfil,
     "principal",
-    xPrincipal,
-    anchoPrincipal
+    x,
+    ancho
   );
 
-  w.seccion(
-    "Experiencia Laboral",
-    datos.experiencia,
-    "principal",
-    xPrincipal,
-    anchoPrincipal
-  );
+  if (String(datos.experiencia || "").trim()) {
+    w.titulo(
+      "Experiencia Laboral",
+      "principal",
+      x,
+      ancho
+    );
+
+    const inicio = w.estado.principal.y-2;
+    const paginaInicio = w.estado.principal.pagina;
+
+    w.texto(
+      datos.experiencia,
+      "principal",
+      x+5,
+      ancho-5,
+      {
+        tamano:9.5,
+        despues:9,
+        color:[24,24,24]
+      }
+    );
+
+    const fin = w.estado.principal.y-9;
+    const paginaFin = w.estado.principal.pagina;
+
+    pdf.setDrawColor(210,210,210);
+    pdf.setLineWidth(0.5);
+
+    for (let p=paginaInicio;p<=paginaFin;p++) {
+      w.pagina(p);
+      pdf.line(
+        x+0.4,
+        p===paginaInicio ? inicio : 18,
+        x+0.4,
+        p===paginaFin ? Math.max(inicio+5,fin) : 280
+      );
+    }
+  }
 
   w.seccion(
     "Cursos y capacitaciones",
     datos.cursos,
     "principal",
-    xPrincipal,
-    anchoPrincipal
+    x,
+    ancho
   );
 
   w.seccion(
     "Idiomas",
     datos.idiomas,
     "principal",
-    xPrincipal,
-    anchoPrincipal
+    x,
+    ancho
   );
 
   if (foto) {
-    const fotoJPEG = await prepararFotoPDF(foto);
-
-    const estado = w.espacio("lateral",53);
+    const jpeg = await prepararFotoPDF(foto);
+    const s = w.espacio("lateral",50);
 
     pdf.addImage(
-      fotoJPEG,
+      jpeg,
       "JPEG",
-      xLateral,
-      estado.y,
-      anchoLateral,
-      49
+      sideX,
+      s.y,
+      sideW,
+      47
     );
 
-    estado.y += 57;
+    s.y += 54;
   }
 
-  w.titulo(
-    "Contacto",
-    "lateral",
-    xLateral,
-    anchoLateral,
-    {tamano:12}
-  );
+  function recuadro(titulo,contenido,contacto=false) {
+    const partes = contacto
+      ? [
+          datos.telefono,
+          datos.email,
+          datos.ciudad
+        ].filter(v=>String(v || "").trim())
+      : [contenido];
 
-  for (const campo of [
-    datos.telefono,
-    datos.email,
-    datos.ciudad
-  ]) {
-    if (campo) {
+    if (!contacto && !String(contenido || "").trim()) {
+      return;
+    }
+
+    const padding = 5.5;
+    const interno = sideW-2*padding;
+    const altoLinea = 9*0.3528*1.45;
+
+    pdf.setFont("helvetica","normal");
+    pdf.setFontSize(9);
+
+    const alturas = partes.map(v =>
+      String(v)
+        .replace(/\r/g,"")
+        .split("\n")
+        .reduce(
+          (a,line) =>
+            a+pdf.splitTextToSize(
+              line || " ",
+              interno
+            ).length*altoLinea,
+          0
+        )
+    );
+
+    const alto = Math.max(
+      26,
+      12+
+      alturas.reduce((a,b)=>a+b,0)+
+      (contacto ? partes.length*6 : 8)+
+      padding*2
+    );
+
+    const s = w.espacio(
+      "lateral",
+      Math.min(alto,260)
+    );
+
+    const y = s.y;
+    const numero = s.pagina;
+
+    pdf.setDrawColor(185,185,185);
+    pdf.setLineWidth(0.3);
+    pdf.rect(
+      sideX,
+      y,
+      sideW,
+      Math.min(alto,260)
+    );
+
+    s.y += 9;
+
+    w.titulo(
+      titulo,
+      "lateral",
+      sideX+padding,
+      interno,
+      {tamano:14}
+    );
+
+    for (let i=0;i<partes.length;i++) {
       w.texto(
-        campo,
+        partes[i],
         "lateral",
-        xLateral,
-        anchoLateral,
+        sideX+padding,
+        interno,
         {
           tamano:9,
-          despues:4
+          despues:contacto ? 3 : 4,
+          color:[24,24,24]
         }
       );
 
-      w.linea(
-        "lateral",
-        xLateral,
-        anchoLateral
+      if (contacto) {
+        const lineaY = w.estado.lateral.y;
+        w.pagina(w.estado.lateral.pagina);
+
+        pdf.setDrawColor(215,215,215);
+        pdf.setLineWidth(0.22);
+        pdf.line(
+          sideX+padding,
+          lineaY,
+          sideX+sideW-padding,
+          lineaY
+        );
+
+        w.estado.lateral.y += 4;
+      }
+    }
+
+    if (w.estado.lateral.pagina===numero) {
+      w.estado.lateral.y = Math.max(
+        w.estado.lateral.y,
+        y+alto+6
       );
+    } else {
+      w.estado.lateral.y += 6;
     }
   }
 
-  w.seccion(
-    "Formación",
-    datos.educacion,
-    "lateral",
-    xLateral,
-    anchoLateral,
-    {
-      tamano:12,
-      textoTamano:9
-    }
-  );
-
-  w.seccion(
-    "Competencias",
-    datos.habilidades,
-    "lateral",
-    xLateral,
-    anchoLateral,
-    {
-      tamano:12,
-      textoTamano:9
-    }
-  );
+  recuadro("Contacto","",true);
+  recuadro("Formación",datos.educacion);
+  recuadro("Competencias",datos.habilidades);
 }
 
 function generarPDFATS(pdf,datos) {
   const w = crearEscritorPDF(pdf);
-
   const x = 20;
   const ancho = 170;
 
@@ -1320,25 +1335,23 @@ function generarPDFATS(pdf,datos) {
     {
       tamano:19,
       negrita:true,
-      alineacion:"center",
+      centrado:true,
       despues:5
     }
   );
 
-  const contacto = [
-    datos.telefono,
-    datos.email,
-    datos.ciudad
-  ].filter(Boolean).join(" · ");
-
   w.texto(
-    contacto,
+    [
+      datos.telefono,
+      datos.email,
+      datos.ciudad
+    ].filter(Boolean).join(" · "),
     "unica",
     x,
     ancho,
     {
       tamano:9,
-      alineacion:"center",
+      centrado:true,
       despues:5
     }
   );
