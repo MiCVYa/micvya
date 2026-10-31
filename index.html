@@ -5,198 +5,719 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MiCVYa | Tu currículum fácil</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font:16px Arial,sans-serif;background:#f4f6fb;color:#20263a}
-header{background:#172554;color:white;padding:22px 7%;font-size:25px;font-weight:bold}
+
+body{
+  margin:0;
+  font:16px Arial,sans-serif;
+  background:#f4f6fb;
+  color:#20263a;
+}
+
+header{
+  background:#172554;
+  color:white;
+  padding:22px 7%;
+  font-size:25px;
+  font-weight:bold;
+}
+
 header span{color:#60a5fa}
-header .brand{background:none;color:inherit;border:0;padding:0;font-size:inherit;font-weight:inherit}
-.price{font-size:30px;font-weight:800;color:#172554;margin:20px 0 4px}
-.price-note{margin:0 0 16px;font-size:14px}
-.choice small{display:block;font-size:12px;line-height:1.5;font-weight:normal;margin-top:8px;color:#475569}
-.modal-overlay{position:fixed;inset:0;background:#0f172ab3;display:grid;place-items:center;padding:16px;z-index:10}
-.modal-box{background:white;border-radius:16px;padding:24px;max-width:430px;width:100%;box-shadow:0 12px 50px #0004}
+
+header .brand{
+  background:none;
+  color:inherit;
+  border:0;
+  padding:0;
+  font-size:inherit;
+  font-weight:inherit;
+}
+
+.price{
+  font-size:30px;
+  font-weight:800;
+  color:#172554;
+  margin:20px 0 4px;
+}
+
+.price-note{
+  margin:0 0 16px;
+  font-size:14px;
+}
+
+.choice small{
+  display:block;
+  font-size:12px;
+  line-height:1.5;
+  font-weight:normal;
+  margin-top:8px;
+  color:#475569;
+}
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:#0f172ab3;
+  display:grid;
+  place-items:center;
+  padding:16px;
+  z-index:10;
+}
+
+.modal-box{
+  background:white;
+  border-radius:16px;
+  padding:24px;
+  max-width:430px;
+  width:100%;
+  box-shadow:0 12px 50px #0004;
+}
+
 .modal-box h2{margin-top:0}
-footer details{max-width:850px;margin:10px auto;text-align:left;border:1px solid #cbd5e1;border-radius:9px;padding:12px 16px;background:white}
-footer summary{cursor:pointer;font-weight:bold;color:#1e293b}
+
+footer details{
+  max-width:850px;
+  margin:10px auto;
+  text-align:left;
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  padding:12px 16px;
+  background:white;
+}
+
+footer summary{
+  cursor:pointer;
+  font-weight:bold;
+  color:#1e293b;
+}
+
 footer details p{font-size:13px}
-footer .footer-note{max-width:850px;margin:16px auto}
-main{max-width:850px;margin:38px auto;padding:0 18px}
-.card{background:white;border-radius:18px;padding:30px;box-shadow:0 8px 30px #17255412;margin-bottom:24px}
+
+footer .footer-note{
+  max-width:850px;
+  margin:16px auto;
+}
+
+main{
+  max-width:850px;
+  margin:38px auto;
+  padding:0 18px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:30px;
+  box-shadow:0 8px 30px #17255412;
+  margin-bottom:24px;
+}
+
 h1{font-size:32px}
-p{line-height:1.5;color:#64748b}
-label{display:block;font-weight:bold;margin:17px 0 7px}
-input,textarea{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:9px;font:16px Arial}
+
+p{
+  line-height:1.5;
+  color:#64748b;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin:17px 0 7px;
+}
+
+input,textarea{
+  width:100%;
+  padding:14px;
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  font:16px Arial;
+}
+
 textarea{min-height:95px}
-button{border:0;border-radius:10px;padding:14px 20px;font-size:16px;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.6;cursor:wait}
-.primary{background:#2563eb;color:white}
-.secondary{background:#e2e8f0;color:#1e293b}
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-.progress{height:8px;background:#e2e8f0;border-radius:20px;margin:22px 0;overflow:hidden}
-#bar{height:100%;background:#2563eb;width:16.67%}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:14px 20px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:wait;
+}
+
+.primary{
+  background:#2563eb;
+  color:white;
+}
+
+.secondary{
+  background:#e2e8f0;
+  color:#1e293b;
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:24px;
+}
+
+.progress{
+  height:8px;
+  background:#e2e8f0;
+  border-radius:20px;
+  margin:22px 0;
+  overflow:hidden;
+}
+
+#bar{
+  height:100%;
+  background:#2563eb;
+  width:16.67%;
+}
+
 .step{display:none}
 .step.active{display:block}
+
 .hint{font-size:13px}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.choice{border:2px solid #cbd5e1;background:white;color:#20263a;text-align:left}
-.choice.selected{border-color:#2563eb;background:#eff6ff}
-[hidden]{display:none!important}
-.preview{background:#e9edf3;padding:12px;overflow:auto}
-.cv{width:794px;min-height:1123px;padding:49px 52px;background:white;color:#111;font-family:Arial,sans-serif;line-height:1.45;box-shadow:0 4px 20px #15234220;overflow-wrap:anywhere}
-.cv section{margin:0 0 24px}
-.cv p{font-size:12px;line-height:1.55;white-space:pre-wrap;color:#111}
-.cv.modern{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);gap:30px;padding:46px 52px}
-.cv.modern h2{font-family:Georgia,serif;font-size:37px;line-height:1.05;letter-spacing:-1px;margin:0 0 32px}
-.cv.modern h3{font-family:Georgia,serif;font-size:18px;color:#2858a7;margin:0 0 9px}
-.cv.modern .sidebox{border:1px solid #b9b9b9;padding:27px 21px;margin-bottom:23px}
-.cv.modern .sidebox p{border-bottom:1px solid #ddd;padding:7px 0}
-.cv.modern .timeline{border-left:2px solid #d2d2d2;padding-left:18px}
-.cv-photo{width:100%;height:190px;object-fit:cover;object-position:center 25%;display:block;margin:0 0 20px;border-radius:5px;background:#e2e8f0}
-.cv.ats{padding:43px 52px}
-.cv.ats .head{text-align:center;border-bottom:1px solid #bbb;padding-bottom:21px;margin-bottom:22px}
-.cv.ats h2{font-size:24px;text-transform:uppercase;margin:0 0 5px}
-.cv.ats .contact{font-size:10px;color:#444}
-.cv.ats section{margin-bottom:17px}
-.cv.ats h3{font-size:12px;text-transform:uppercase;margin:0 0 8px}
-.cv.ats p{font-size:10.5px}
-.example-notice{padding:14px;background:#eff6ff;border-radius:10px;margin:18px 0;color:#1e40af}
-footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
-@media(max-width:600px){
-.card{padding:20px}
-.choices{grid-template-columns:1fr}
-.actions button{flex:1}
+
+.choices{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
-@media print{body{display:none!important}}
+
+.choice{
+  border:2px solid #cbd5e1;
+  background:white;
+  color:#20263a;
+  text-align:left;
+}
+
+.choice.selected{
+  border-color:#2563eb;
+  background:#eff6ff;
+}
+
+[hidden]{display:none!important}
+
+.preview{
+  background:#e9edf3;
+  padding:12px;
+  overflow:auto;
+}
+
+.cv{
+  width:794px;
+  min-height:1123px;
+  padding:49px 52px;
+  background:white;
+  color:#111;
+  font-family:Arial,sans-serif;
+  line-height:1.45;
+  box-shadow:0 4px 20px #15234220;
+  overflow-wrap:anywhere;
+}
+
+.cv section{margin:0 0 24px}
+
+.cv p{
+  font-size:12px;
+  line-height:1.55;
+  white-space:pre-wrap;
+  color:#111;
+}
+
+.cv.modern{
+  display:grid;
+  grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);
+  gap:30px;
+  padding:46px 52px;
+}
+
+.cv.modern h2{
+  font-family:Georgia,serif;
+  font-size:37px;
+  line-height:1.05;
+  letter-spacing:-1px;
+  margin:0 0 32px;
+}
+
+.cv.modern h3{
+  font-family:Georgia,serif;
+  font-size:18px;
+  color:#2858a7;
+  margin:0 0 9px;
+}
+
+.cv.modern .sidebox{
+  border:1px solid #b9b9b9;
+  padding:27px 21px;
+  margin-bottom:23px;
+}
+
+.cv.modern .sidebox p{
+  border-bottom:1px solid #ddd;
+  padding:7px 0;
+}
+
+.cv.modern .timeline{
+  border-left:2px solid #d2d2d2;
+  padding-left:18px;
+}
+
+.cv-photo{
+  width:100%;
+  height:190px;
+  object-fit:cover;
+  object-position:center 25%;
+  display:block;
+  margin:0 0 20px;
+  border-radius:5px;
+  background:#e2e8f0;
+}
+
+.cv.ats{padding:43px 52px}
+
+.cv.ats .head{
+  text-align:center;
+  border-bottom:1px solid #bbb;
+  padding-bottom:21px;
+  margin-bottom:22px;
+}
+
+.cv.ats h2{
+  font-size:24px;
+  text-transform:uppercase;
+  margin:0 0 5px;
+}
+
+.cv.ats .contact{
+  font-size:10px;
+  color:#444;
+}
+
+.cv.ats section{margin-bottom:17px}
+
+.cv.ats h3{
+  font-size:12px;
+  text-transform:uppercase;
+  margin:0 0 8px;
+}
+
+.cv.ats p{font-size:10.5px}
+
+.example-notice{
+  padding:14px;
+  background:#eff6ff;
+  border-radius:10px;
+  margin:18px 0;
+  color:#1e40af;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  font-size:13px;
+  color:#64748b;
+}
+
+@media(max-width:600px){
+  .card{padding:20px}
+  .choices{grid-template-columns:1fr}
+  .actions button{flex:1}
+}
+
+@media print{
+  body{display:none!important}
+}
 </style>
 </head>
+
 <body>
 
-<header><button type="button" class="brand" onclick="requestHome()" aria-label="MiCVYa, volver al inicio">MiCV<span>Ya</span></button></header>
+<header>
+  <button
+    type="button"
+    class="brand"
+    onclick="requestHome()"
+    aria-label="MiCVYa, volver al inicio"
+  >
+    MiCV<span>Ya</span>
+  </button>
+</header>
 
 <main>
+
 <div class="card" id="welcome">
-<h1>¿Nunca hiciste un currículum? No importa. Nosotros te guiamos.</h1>
-<p>Respondé unas preguntas sencillas y prepará tu CV paso a paso.</p>
-<div class="price">$5.000 ARS</div>
-<p class="price-note">Pago único · Sin suscripciones · Pagás mediante Mercado Pago al finalizar</p>
-<button class="primary" onclick="start()">Comenzar a crear mi CV</button>
+  <h1>¿Nunca hiciste un currículum? No importa. Nosotros te guiamos.</h1>
+  <p>Respondé unas preguntas sencillas y prepará tu CV paso a paso.</p>
+
+  <div class="price">$5.000 ARS</div>
+
+  <p class="price-note">
+    Pago único · Sin suscripciones · Pagás mediante Mercado Pago al finalizar
+  </p>
+
+  <button class="primary" onclick="start()">
+    Comenzar a crear mi CV
+  </button>
 </div>
 
 <div class="card" id="builder" hidden>
-<h1>Creá tu currículum</h1>
-<p>Completá tus datos. Te guiamos paso a paso.</p>
-<div class="progress"><div id="bar"></div></div>
 
-<section class="step active">
-<h2>¿Cómo te llamás?</h2>
-<label>Nombre y apellido *</label>
-<input id="nombre" autocomplete="name" placeholder="Ej: Juan Pérez">
-<label>Teléfono *</label>
-<input id="telefono" autocomplete="tel" placeholder="Ej: 11 1234 5678">
-<label>Correo electrónico</label>
-<input id="email" type="email" autocomplete="email" placeholder="Ej: juan@gmail.com">
-<label>Localidad y provincia</label>
-<input id="ciudad" placeholder="Ej: La Plata, Buenos Aires">
-</section>
+  <h1>Creá tu currículum</h1>
+  <p>Completá tus datos. Te guiamos paso a paso.</p>
 
-<section class="step">
-<h2>Contanos algo sobre vos</h2>
-<label>Breve presentación personal</label>
-<textarea id="perfil" placeholder="Contanos cómo sos trabajando, qué habilidades tenés, qué podés aportar a una empresa y si contás con movilidad propia o flexibilidad de horarios."></textarea>
-</section>
+  <div class="progress">
+    <div id="bar"></div>
+  </div>
 
-<section class="step">
-<h2>Experiencia laboral</h2>
-<label>Experiencia laboral</label>
-<textarea id="experiencia" placeholder="Empresa, puesto, fechas y tareas"></textarea>
-<p class="hint">¿Nunca trabajaste? Podés dejarlo vacío.</p>
-</section>
+  <section class="step active">
+    <h2>¿Cómo te llamás?</h2>
 
-<section class="step">
-<h2>¿Qué estudios tenés?</h2>
-<label>Educación</label>
-<textarea id="educacion" placeholder="Ej: Secundario completo, escuela..."></textarea>
-<label>Cursos o capacitaciones</label>
-<textarea id="cursos" placeholder="Ej: Excel, atención al cliente"></textarea>
-</section>
+    <label>Nombre y apellido *</label>
+    <input id="nombre" autocomplete="name" placeholder="Ej: Juan Pérez">
 
-<section class="step">
-<h2>¡Últimos detalles!</h2>
-<label>Habilidades</label>
-<textarea id="habilidades" placeholder="Ej: Trabajo en equipo, organización"></textarea>
-<label>Idiomas</label>
-<input id="idiomas" placeholder="Ej: Español nativo, inglés básico">
-</section>
+    <label>Teléfono *</label>
+    <input id="telefono" autocomplete="tel" placeholder="Ej: 11 1234 5678">
 
-<section class="step">
-<h2>Elegí tu diseño</h2>
-<div class="choices">
-<button type="button" class="choice selected" id="modernBtn" onclick="choose('modern')">Moderno con foto opcional</button>
-<button type="button" class="choice" id="atsBtn" onclick="choose('ats')">Simple compatible con filtro ATS (sin foto)<small>Diseño limpio y profesional, pensado para facilitar la lectura por sistemas de selección de personal.</small></button>
-</div>
-<div id="photoFields">
-<label>Foto (opcional, hasta 5 MB)</label>
-<input type="file" id="foto" accept="image/jpeg,image/png,image/webp" onchange="photoChanged(event)">
-</div>
-<p class="hint">El diseño ATS utiliza una columna y texto seleccionable. No garantiza superar todos los sistemas de selección.</p>
-</section>
+    <label>Correo electrónico</label>
+    <input id="email" type="email" autocomplete="email" placeholder="Ej: juan@gmail.com">
 
-<div class="actions">
-<button class="secondary" id="back" onclick="move(-1)" hidden>Volver</button>
-<button class="primary" id="next" onclick="move(1)">Continuar</button>
-</div>
+    <label>Localidad y provincia</label>
+    <input id="ciudad" placeholder="Ej: La Plata, Buenos Aires">
+  </section>
+
+  <section class="step">
+    <h2>Contanos algo sobre vos</h2>
+
+    <label>Breve presentación personal</label>
+    <textarea
+      id="perfil"
+      placeholder="Contanos cómo sos trabajando, qué habilidades tenés, qué podés aportar a una empresa y si contás con movilidad propia o flexibilidad de horarios."
+    ></textarea>
+  </section>
+
+  <section class="step">
+    <h2>Experiencia laboral</h2>
+
+    <label>Experiencia laboral</label>
+    <textarea
+      id="experiencia"
+      placeholder="Empresa, puesto, fechas y tareas"
+    ></textarea>
+
+    <p class="hint">¿Nunca trabajaste? Podés dejarlo vacío.</p>
+  </section>
+
+  <section class="step">
+    <h2>¿Qué estudios tenés?</h2>
+
+    <label>Educación</label>
+    <textarea
+      id="educacion"
+      placeholder="Ej: Secundario completo, escuela..."
+    ></textarea>
+
+    <label>Cursos o capacitaciones</label>
+    <textarea
+      id="cursos"
+      placeholder="Ej: Excel, atención al cliente"
+    ></textarea>
+  </section>
+
+  <section class="step">
+    <h2>¡Últimos detalles!</h2>
+
+    <label>Habilidades</label>
+    <textarea
+      id="habilidades"
+      placeholder="Ej: Trabajo en equipo, organización"
+    ></textarea>
+
+    <label>Idiomas</label>
+    <input
+      id="idiomas"
+      placeholder="Ej: Español nativo, inglés básico"
+    >
+  </section>
+
+  <section class="step">
+    <h2>Elegí tu diseño</h2>
+
+    <div class="choices">
+      <button
+        type="button"
+        class="choice selected"
+        id="modernBtn"
+        onclick="choose('modern')"
+      >
+        Moderno con foto opcional
+      </button>
+
+      <button
+        type="button"
+        class="choice"
+        id="atsBtn"
+        onclick="choose('ats')"
+      >
+        Simple compatible con filtro ATS (sin foto)
+
+        <small>
+          Diseño limpio y profesional, pensado para facilitar
+          la lectura por sistemas de selección de personal.
+        </small>
+      </button>
+    </div>
+
+    <div id="photoFields">
+      <label>Foto (opcional, hasta 5 MB)</label>
+
+      <input
+        type="file"
+        id="foto"
+        accept="image/jpeg,image/png,image/webp"
+        onchange="photoChanged(event)"
+      >
+    </div>
+
+    <p class="hint">
+      El diseño ATS utiliza una columna y texto seleccionable.
+      No garantiza superar todos los sistemas de selección.
+    </p>
+  </section>
+
+  <div class="actions">
+    <button
+      class="secondary"
+      id="back"
+      onclick="move(-1)"
+      hidden
+    >
+      Volver
+    </button>
+
+    <button
+      class="primary"
+      id="next"
+      onclick="move(1)"
+    >
+      Continuar
+    </button>
+  </div>
+
 </div>
 
 <div class="card" id="previewCard" hidden>
-<h2>¡Terminaste de completar tus datos!</h2>
-<p>Este es un ejemplo del diseño que elegiste.</p>
-<div class="example-notice">
-<strong>Vista de ejemplo</strong>
-<p>Los datos de Juan Pérez y su foto son ficticios. Tu currículum verdadero llevará tus datos y, si elegiste el diseño moderno con foto, la imagen que subiste.</p>
-</div>
-<div class="preview" id="preview"></div>
-<div class="actions">
-<button class="secondary" onclick="editCV()">Editar mis datos</button>
-<button class="primary" id="testPaymentBtn" onclick="testPayment()">Pagar $5.000 y obtener mi CV</button>
-</div>
+
+  <h2>¡Terminaste de completar tus datos!</h2>
+
+  <p>Este es un ejemplo del diseño que elegiste.</p>
+
+  <div class="example-notice">
+    <strong>Vista de ejemplo</strong>
+
+    <p>
+      Los datos de Juan Pérez y su foto son ficticios.
+      Tu currículum verdadero llevará tus datos y,
+      si elegiste el diseño moderno con foto,
+      la imagen que subiste.
+    </p>
+  </div>
+
+  <div class="preview" id="preview"></div>
+
+  <div class="actions">
+    <button class="secondary" onclick="editCV()">
+      Editar mis datos
+    </button>
+
+    <button
+      class="primary"
+      id="testPaymentBtn"
+      onclick="testPayment()"
+    >
+      Pagar $5.000 y obtener mi CV
+    </button>
+  </div>
+
 </div>
 
 <div class="card" id="paymentCard" hidden>
-<h2>Estamos preparando tu currículum</h2>
-<p id="paymentMessage" role="status" aria-live="polite">Comprobando el pago automáticamente...</p>
-<div class="actions">
-<button class="secondary" id="verifyBtn" onclick="verifyPayment()">Comprobar ahora</button>
-</div>
-<p class="hint">Si ya pagaste, no vuelvas a pagar. La página comprobará el pago automáticamente durante unos minutos.</p>
+
+  <h2>Estamos preparando tu currículum</h2>
+
+  <p id="paymentMessage" role="status" aria-live="polite">
+    Comprobando el pago automáticamente...
+  </p>
+
+  <div class="actions">
+    <button
+      class="secondary"
+      id="verifyBtn"
+      onclick="verifyPayment()"
+    >
+      Comprobar ahora
+    </button>
+  </div>
+
+  <p class="hint">
+    Si ya pagaste, no vuelvas a pagar.
+    La página comprobará el pago automáticamente
+    durante unos minutos.
+  </p>
+
 </div>
 
 <div class="card" id="resultCard" hidden>
-<h2>¡Tu currículum está listo!</h2>
-<p>Tu pago fue confirmado. Este es tu CV verdadero.</p>
-<div class="preview" id="realPreview"></div>
-<div class="actions">
-<button class="primary" id="downloadBtn" onclick="downloadCV()">Descargar mi CV en PDF</button>
+
+  <h2>¡Tu currículum está listo!</h2>
+
+  <p>
+    Tu pago fue confirmado.
+    Este es tu CV verdadero.
+  </p>
+
+  <div class="preview" id="realPreview"></div>
+
+  <div class="actions">
+    <button
+      class="primary"
+      id="downloadBtn"
+      onclick="downloadCV()"
+    >
+      Descargar mi CV en PDF
+    </button>
+  </div>
+
+  <p class="hint" id="downloadMessage">
+    El archivo se genera directamente en tu dispositivo.
+    No necesitás abrir la ventana de impresión.
+  </p>
+
 </div>
-<p class="hint" id="downloadMessage">El archivo se genera directamente en tu dispositivo. No necesitás abrir la ventana de impresión.</p>
-</div>
+
 </main>
 
 <footer>
-  <details><summary>Quiénes somos</summary><p>MiCVYa es una plataforma argentina creada para ayudar a las personas a elaborar su currículum de manera rápida, sencilla y profesional. Nuestro objetivo es que cualquier persona pueda presentar su experiencia laboral, estudios y habilidades de forma clara y organizada, sin necesitar conocimientos de diseño. Ofrecemos modelos de currículum en PDF, listos para descargar y utilizar en búsquedas laborales.</p></details>
-  <details><summary>Información comercial</summary><p>Nombre comercial: MiCVYa. Servicio digital de elaboración de currículums en PDF. Precio: $5.000 ARS por currículum, pago único mediante Mercado Pago. Antes de habilitar ventas reales se completarán los datos legales y fiscales del prestador.</p></details>
-  <details><summary>Ayuda y soporte</summary><p>Los canales de WhatsApp Business y correo de soporte se publicarán cuando estén habilitados. Si ya realizaste un pago de prueba, conservá este navegador y no vuelvas a pagar ante una demora.</p></details>
-  <details><summary>Privacidad y condiciones</summary><p>Los datos ingresados se utilizan para preparar el currículum. Si adjuntás una foto, se procesa mediante almacenamiento privado. El servicio no garantiza conseguir empleo. Antes de recibir pagos reales se publicará la política completa de privacidad, conservación de datos y condiciones de contratación.</p></details>
-  <details><summary>Arrepentimiento y devoluciones</summary><p>Antes del lanzamiento comercial se habilitará un canal de solicitudes y el mecanismo de arrepentimiento que corresponda conforme a la normativa aplicable.</p></details>
-  <p class="footer-note">MiCVYa © 2026 · Versión de pruebas. No habilitar cobros reales hasta completar la información comercial y legal.</p>
+
+  <details>
+    <summary>Quiénes somos</summary>
+
+    <p>
+      MiCVYa es una plataforma argentina creada para ayudar
+      a las personas a elaborar su currículum de manera
+      rápida, sencilla y profesional.
+      Nuestro objetivo es que cualquier persona pueda
+      presentar su experiencia laboral, estudios y habilidades
+      de forma clara y organizada, sin necesitar conocimientos
+      de diseño. Ofrecemos modelos de currículum en PDF,
+      listos para descargar y utilizar en búsquedas laborales.
+    </p>
+  </details>
+
+  <details>
+    <summary>Información comercial</summary>
+
+    <p>
+      Nombre comercial: MiCVYa.
+      Servicio digital de elaboración de currículums en PDF.
+      Precio: $5.000 ARS por currículum.
+      Pago único mediante Mercado Pago.
+      Antes de habilitar ventas reales se completarán
+      los datos legales y fiscales del prestador.
+    </p>
+  </details>
+
+  <details>
+    <summary>Ayuda y soporte</summary>
+
+    <p>
+      Los canales de WhatsApp Business y correo de soporte
+      se publicarán cuando estén habilitados.
+    </p>
+  </details>
+
+  <details>
+    <summary>Privacidad y condiciones</summary>
+
+    <p>
+      Los datos ingresados se utilizan para preparar
+      el currículum. Si adjuntás una foto, se procesa
+      mediante almacenamiento privado.
+      El servicio no garantiza conseguir empleo.
+      Antes de recibir pagos reales se publicará
+      la política completa de privacidad,
+      conservación de datos y condiciones de contratación.
+    </p>
+  </details>
+
+  <details>
+    <summary>Arrepentimiento y devoluciones</summary>
+
+    <p>
+      Antes del lanzamiento comercial se habilitará
+      un canal de solicitudes y el mecanismo de
+      arrepentimiento que corresponda conforme
+      a la normativa aplicable.
+    </p>
+  </details>
+
+  <p class="footer-note">
+    MiCVYa © 2026 · Versión de pruebas.
+    No habilitar cobros reales hasta completar
+    la información comercial y legal.
+  </p>
+
 </footer>
-<div class="modal-overlay" id="homeModal" hidden role="dialog" aria-modal="true" aria-labelledby="homeTitle">
- <div class="modal-box"><h2 id="homeTitle">¿Querés volver al inicio?</h2><p>Ya comenzaste a completar tu currículum. Si salís, podrías perder los datos ingresados.</p><div class="actions"><button class="secondary" type="button" onclick="closeHomeModal()">Seguir editando</button><button class="primary" type="button" onclick="goHome()">Volver al inicio</button></div></div>
+
+<div
+  class="modal-overlay"
+  id="homeModal"
+  hidden
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="homeTitle"
+>
+  <div class="modal-box">
+    <h2 id="homeTitle">¿Querés volver al inicio?</h2>
+
+    <p>
+      Ya comenzaste a completar tu currículum.
+      Si salís, podrías perder los datos ingresados.
+    </p>
+
+    <div class="actions">
+      <button
+        class="secondary"
+        type="button"
+        onclick="closeHomeModal()"
+      >
+        Seguir editando
+      </button>
+
+      <button
+        class="primary"
+        type="button"
+        onclick="goHome()"
+      >
+        Volver al inicio
+      </button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+
 let current = 0;
 let design = "modern";
 let photoFile = null;
@@ -204,22 +725,119 @@ let paidCV = null;
 let paidPhoto = "";
 
 const steps = [...document.querySelectorAll(".step")];
+
 const el = id => document.getElementById(id);
 const val = id => el(id).value.trim();
 
+
+// ========================================
+// CORRECCIÓN AUTOMÁTICA SIN INTELIGENCIA
+// ARTIFICIAL
+// ========================================
+
+// Limpia espacios innecesarios y saltos de línea.
+function formatoBasico(valor) {
+  return String(valor ?? "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(linea => linea.replace(/[ \t]+/g, " ").trim())
+    .join("\n")
+    .trim();
+}
+
+// Convierte la primera letra de cada palabra
+// a mayúscula. Se utiliza en nombres y ciudades.
+function mayusculaCadaPalabra(valor) {
+  return formatoBasico(valor).replace(
+    /(^|[\s,.-])([a-záéíóúüñ])/giu,
+    (coincidencia, separador, letra) =>
+      separador + letra.toLocaleUpperCase("es-AR")
+  );
+}
+
+// Coloca mayúscula al comienzo de cada oración,
+// después de un punto, signo de pregunta,
+// exclamación y al comenzar un nuevo renglón.
+function mayusculaOraciones(valor) {
+  const texto = formatoBasico(valor);
+
+  let comienzo = true;
+
+  return Array.from(texto).map(caracter => {
+    if (comienzo && /\p{L}/u.test(caracter)) {
+      comienzo = false;
+      return caracter.toLocaleUpperCase("es-AR");
+    }
+
+    if (/[.!?\n]/.test(caracter)) {
+      comienzo = true;
+    }
+
+    return caracter;
+  }).join("");
+}
+
+// Aplica las reglas correspondientes a cada campo.
+// No inventa información ni reescribe experiencias.
+function mejorarDatosCV(datos) {
+  return {
+    ...datos,
+
+    nombre: mayusculaCadaPalabra(datos.nombre),
+
+    telefono: formatoBasico(datos.telefono),
+
+    email: formatoBasico(datos.email),
+
+    ciudad: mayusculaCadaPalabra(datos.ciudad),
+
+    perfil: mayusculaOraciones(datos.perfil),
+
+    experiencia: mayusculaOraciones(datos.experiencia),
+
+    educacion: mayusculaOraciones(datos.educacion),
+
+    cursos: mayusculaOraciones(datos.cursos),
+
+    habilidades: mayusculaOraciones(datos.habilidades),
+
+    idiomas: mayusculaOraciones(datos.idiomas)
+  };
+}
+
+
+// ========================================
+// NAVEGACIÓN
+// ========================================
+
 function showCard(id) {
-  ["welcome","builder","previewCard","paymentCard","resultCard"]
-    .forEach(name => el(name).hidden = name !== id);
-  window.scrollTo(0,0);
+  [
+    "welcome",
+    "builder",
+    "previewCard",
+    "paymentCard",
+    "resultCard"
+  ].forEach(name => {
+    el(name).hidden = name !== id;
+  });
+
+  window.scrollTo(0, 0);
 }
 
 function requestHome() {
-  if (!el("welcome").hidden && !el("homeModal").hidden) return;
   if (!el("welcome").hidden) return;
-  if (!el("paymentCard").hidden || !el("resultCard").hidden) {
-    alert("Tu compra está en proceso o ya fue confirmada. Para proteger el acceso a tu CV, permanecé en esta pantalla.");
+
+  if (
+    !el("paymentCard").hidden ||
+    !el("resultCard").hidden
+  ) {
+    alert(
+      "Tu compra está en proceso o ya fue confirmada. " +
+      "Para proteger el acceso a tu CV, permanecé en esta pantalla."
+    );
     return;
   }
+
   el("homeModal").hidden = false;
 }
 
@@ -237,8 +855,8 @@ function start() {
 }
 
 function update() {
-  steps.forEach((step,i) => {
-    step.classList.toggle("active",i === current);
+  steps.forEach((step, i) => {
+    step.classList.toggle("active", i === current);
   });
 
   el("bar").style.width =
@@ -267,9 +885,9 @@ function move(direction) {
     return;
   }
 
-  current = Math.max(0,current + direction);
+  current = Math.max(0, current + direction);
   update();
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 function choose(selected) {
@@ -290,12 +908,13 @@ function choose(selected) {
 
 function photoChanged(event) {
   const file = event.target.files[0];
+
   photoFile = null;
 
   if (!file) return;
 
   if (
-    !["image/jpeg","image/png","image/webp"].includes(file.type) ||
+    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
     file.size === 0 ||
     file.size > 5 * 1024 * 1024
   ) {
@@ -307,15 +926,22 @@ function photoChanged(event) {
   photoFile = file;
 }
 
-async function subirFotoPrivada(tokenDescarga,file) {
-  const autorizacion = await fetch("/api/subir-foto",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    cache:"no-store",
-    body:JSON.stringify({
+
+// ========================================
+// FOTO PRIVADA
+// ========================================
+
+async function subirFotoPrivada(tokenDescarga, file) {
+  const autorizacion = await fetch("/api/subir-foto", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    cache: "no-store",
+    body: JSON.stringify({
       tokenDescarga,
-      tipo:file.type,
-      tamano:file.size
+      tipo: file.type,
+      tamano: file.size
     })
   });
 
@@ -361,10 +987,12 @@ async function subirFotoPrivada(tokenDescarga,file) {
     permiso.token
   );
 
-  const subida = await fetch(urlSubida,{
-    method:"PUT",
-    headers:{"Content-Type":file.type},
-    body:file
+  const subida = await fetch(urlSubida, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type
+    },
+    body: file
   });
 
   if (!subida.ok) {
@@ -376,12 +1004,14 @@ async function subirFotoPrivada(tokenDescarga,file) {
   const confirmacion = await fetch(
     "/api/confirmar-foto",
     {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      cache:"no-store",
-      body:JSON.stringify({
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({
         tokenDescarga,
-        path:permiso.path
+        path: permiso.path
       })
     }
   );
@@ -396,56 +1026,70 @@ async function subirFotoPrivada(tokenDescarga,file) {
   }
 }
 
+
+// ========================================
+// EJEMPLO FICTICIO
+// ========================================
+
 const fotoEjemplo =
   "/foto_ejemplo_juan_perez.png.jpg";
 
 const ejemplo = {
-  nombre:"Juan Pérez",
-  telefono:"11 1234 5678",
-  email:"juan.perez@ejemplo.com",
-  ciudad:"Buenos Aires, Argentina",
-  perfil:"Persona responsable, organizada y con buena predisposición para aprender.",
-  experiencia:"Asistente de ventas - Empresa Ejemplo (2022-2025)\nAtención al público y organización de productos.",
-  educacion:"Secundario completo - Escuela Ejemplo",
-  cursos:"Curso de Excel básico\nAtención al cliente",
-  habilidades:"Trabajo en equipo\nComunicación\nOrganización",
-  idiomas:"Español nativo\nInglés básico"
+  nombre: "Juan Pérez",
+  telefono: "11 1234 5678",
+  email: "juan.perez@ejemplo.com",
+  ciudad: "Buenos Aires, Argentina",
+  perfil:
+    "Persona responsable, organizada y con buena predisposición para aprender.",
+  experiencia:
+    "Asistente de ventas - Empresa Ejemplo (2022-2025)\nAtención al público y organización de productos.",
+  educacion:
+    "Secundario completo - Escuela Ejemplo",
+  cursos:
+    "Curso de Excel básico\nAtención al cliente",
+  habilidades:
+    "Trabajo en equipo\nComunicación\nOrganización",
+  idiomas:
+    "Español nativo\nInglés básico"
 };
 
 function escapeHTML(value) {
   return String(value ?? "").replace(
     /[&<>"']/g,
     char => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#39;"
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
     })[char]
   );
 }
 
-function formatoBasico(valor) {
-  return String(valor ?? "")
-    .replace(/\r/g, "")
-    .split("\n")
-    .map(linea => linea.replace(/[ \t]+/g," ").trim())
-    .filter((linea, i, arr) => linea || (i > 0 && arr[i-1]))
-    .join("\n")
-    .trim();
-}
 
-function renderCV(data,selectedDesign,foto = "") {
+// ========================================
+// DISEÑOS DE CV
+// ========================================
+
+function renderCV(data, selectedDesign, foto = "") {
+  const mejorados = mejorarDatosCV(data);
   const d = {};
 
   const fields = [
-    "nombre","telefono","email","ciudad",
-    "perfil","experiencia","educacion",
-    "cursos","habilidades","idiomas"
+    "nombre",
+    "telefono",
+    "email",
+    "ciudad",
+    "perfil",
+    "experiencia",
+    "educacion",
+    "cursos",
+    "habilidades",
+    "idiomas"
   ];
 
   for (const field of fields) {
-    d[field] = escapeHTML(formatoBasico(data[field]));
+    d[field] = escapeHTML(mejorados[field]);
   }
 
   if (selectedDesign === "modern") {
@@ -457,37 +1101,45 @@ function renderCV(data,selectedDesign,foto = "") {
       <article class="cv modern">
         <div>
           <h2>${d.nombre}</h2>
+
           <section>
             <h3>Resumen Profesional</h3>
             <p>${d.perfil}</p>
           </section>
+
           <section>
             <h3>Experiencia Laboral</h3>
             <div class="timeline">
               <p>${d.experiencia}</p>
             </div>
           </section>
+
           <section>
             <h3>Cursos y capacitaciones</h3>
             <p>${d.cursos}</p>
           </section>
+
           <section>
             <h3>Idiomas</h3>
             <p>${d.idiomas}</p>
           </section>
         </div>
+
         <aside>
           ${fotoHTML}
+
           <div class="sidebox">
             <h3>Contacto</h3>
             <p>${d.telefono}</p>
             <p>${d.email}</p>
             <p>${d.ciudad}</p>
           </div>
+
           <div class="sidebox">
             <h3>Formación</h3>
             <p>${d.educacion}</p>
           </div>
+
           <div class="sidebox">
             <h3>Competencias</h3>
             <p>${d.habilidades}</p>
@@ -501,30 +1153,37 @@ function renderCV(data,selectedDesign,foto = "") {
     <article class="cv ats">
       <div class="head">
         <h2>${d.nombre}</h2>
+
         <div class="contact">
           ${d.telefono} · ${d.email} · ${d.ciudad}
         </div>
       </div>
+
       <section>
         <h3>Perfil profesional</h3>
         <p>${d.perfil}</p>
       </section>
+
       <section>
         <h3>Educación</h3>
         <p>${d.educacion}</p>
       </section>
+
       <section>
         <h3>Experiencia profesional</h3>
         <p>${d.experiencia}</p>
       </section>
+
       <section>
         <h3>Habilidades</h3>
         <p>${d.habilidades}</p>
       </section>
+
       <section>
         <h3>Certificaciones y cursos</h3>
         <p>${d.cursos}</p>
       </section>
+
       <section>
         <h3>Idiomas</h3>
         <p>${d.idiomas}</p>
@@ -549,33 +1208,41 @@ function editCV() {
   showCard("builder");
 }
 
+
+// ========================================
+// MERCADO PAGO
+// ========================================
+
 async function testPayment() {
   const button = el("testPaymentBtn");
+
   button.disabled = true;
   button.textContent = "Preparando pago...";
 
   try {
     const datos_cv = {
-      nombre:val("nombre"),
-      telefono:val("telefono"),
-      email:val("email"),
-      ciudad:val("ciudad"),
-      perfil:val("perfil"),
-      experiencia:val("experiencia"),
-      educacion:val("educacion"),
-      cursos:val("cursos"),
-      habilidades:val("habilidades"),
-      idiomas:val("idiomas")
+      nombre: val("nombre"),
+      telefono: val("telefono"),
+      email: val("email"),
+      ciudad: val("ciudad"),
+      perfil: val("perfil"),
+      experiencia: val("experiencia"),
+      educacion: val("educacion"),
+      cursos: val("cursos"),
+      habilidades: val("habilidades"),
+      idiomas: val("idiomas")
     };
 
     const response = await fetch(
       "/api/crear-pago",
       {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
           datos_cv,
-          diseno:design
+          diseno: design
         })
       }
     );
@@ -645,14 +1312,21 @@ async function testPayment() {
   }
 }
 
+
+// ========================================
+// RECUPERACIÓN DE FOTO PAGADA
+// ========================================
+
 async function obtenerFotoPagada(tokenDescarga) {
   const response = await fetch(
     "/api/ver-foto",
     {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      cache:"no-store",
-      body:JSON.stringify({tokenDescarga})
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({ tokenDescarga })
     }
   );
 
@@ -692,9 +1366,9 @@ async function obtenerFotoPagada(tokenDescarga) {
     );
   }
 
-  const respuestaFoto = await fetch(url.href,{
-    method:"GET",
-    cache:"no-store"
+  const respuestaFoto = await fetch(url.href, {
+    method: "GET",
+    cache: "no-store"
   });
 
   if (!respuestaFoto.ok) {
@@ -725,7 +1399,7 @@ async function obtenerFotoPagada(tokenDescarga) {
     );
   }
 
-  return await new Promise((resolve,reject) => {
+  return await new Promise((resolve, reject) => {
     const lector = new FileReader();
 
     lector.onload = () => {
@@ -733,9 +1407,7 @@ async function obtenerFotoPagada(tokenDescarga) {
 
       if (
         typeof resultado !== "string" ||
-        !/^data:image\/(jpeg|png|webp);base64,/.test(
-          resultado
-        )
+        !/^data:image\/(jpeg|png|webp);base64,/.test(resultado)
       ) {
         reject(
           new Error("No se pudo preparar la foto")
@@ -755,6 +1427,11 @@ async function obtenerFotoPagada(tokenDescarga) {
     lector.readAsDataURL(imagen);
   });
 }
+
+
+// ========================================
+// VERIFICACIÓN AUTOMÁTICA DEL PAGO
+// ========================================
 
 const PAYMENT_RETRY_MS = 3000;
 const PAYMENT_MAX_WAIT_MS = 3 * 60 * 1000;
@@ -782,7 +1459,9 @@ function schedulePaymentRetry(generation) {
 
   if (elapsed >= PAYMENT_MAX_WAIT_MS) {
     el("paymentMessage").textContent =
-      "La comprobación automática está tardando más de lo esperado. Si ya pagaste, no vuelvas a pagar. Podés tocar «Comprobar ahora» para volver a intentarlo.";
+      "La comprobación automática está tardando más de lo esperado. " +
+      "Si ya pagaste, no vuelvas a pagar. " +
+      "Podés tocar «Comprobar ahora» para volver a intentarlo.";
 
     el("verifyBtn").hidden = false;
     el("verifyBtn").disabled = false;
@@ -804,7 +1483,8 @@ function beginAutomaticPaymentCheck() {
     showCard("paymentCard");
 
     el("paymentMessage").textContent =
-      "No encontramos la clave de recuperación en este navegador. Si pagaste desde otro dispositivo o navegador, no vuelvas a pagar. Estamos preparando la recuperación por correo electrónico.";
+      "No encontramos la clave de recuperación en este navegador. " +
+      "Si pagaste desde otro dispositivo o navegador, no vuelvas a pagar.";
 
     el("verifyBtn").hidden = true;
     return;
@@ -821,7 +1501,8 @@ function beginAutomaticPaymentCheck() {
   showCard("paymentCard");
 
   el("paymentMessage").textContent =
-    "Estamos preparando tu CV. Comprobaremos el pago automáticamente...";
+    "Estamos preparando tu CV. " +
+    "Comprobaremos el pago automáticamente...";
 
   checkPaymentOnce(paymentGeneration);
 }
@@ -857,10 +1538,14 @@ async function checkPaymentOnce(generation) {
     const response = await fetch(
       "/api/verificar-cv",
       {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        cache:"no-store",
-        body:JSON.stringify({tokenDescarga:token})
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        cache: "no-store",
+        body: JSON.stringify({
+          tokenDescarga: token
+        })
       }
     );
 
@@ -878,7 +1563,8 @@ async function checkPaymentOnce(generation) {
 
     if (!data.aprobado) {
       el("paymentMessage").textContent =
-        "Estamos esperando la confirmación de Mercado Pago. No necesitás hacer nada, seguiremos comprobando automáticamente.";
+        "Estamos esperando la confirmación de Mercado Pago. " +
+        "No necesitás hacer nada, seguiremos comprobando automáticamente.";
 
       shouldRetry = true;
       return;
@@ -886,7 +1572,7 @@ async function checkPaymentOnce(generation) {
 
     if (
       !data.datos_cv ||
-      !["modern","ats"].includes(data.diseno)
+      !["modern", "ats"].includes(data.diseno)
     ) {
       throw new Error(
         "Los datos del currículum están incompletos"
@@ -894,8 +1580,8 @@ async function checkPaymentOnce(generation) {
     }
 
     paidCV = {
-      datos_cv:data.datos_cv,
-      diseno:data.diseno
+      datos_cv: data.datos_cv,
+      diseno: data.diseno
     };
 
     paidPhoto = "";
@@ -916,7 +1602,8 @@ async function checkPaymentOnce(generation) {
         );
 
         el("paymentMessage").textContent =
-          "Tu pago está aprobado. Estamos intentando recuperar tu foto automáticamente...";
+          "Tu pago está aprobado. " +
+          "Estamos intentando recuperar tu foto automáticamente...";
 
         shouldRetry = true;
         return;
@@ -947,7 +1634,8 @@ async function checkPaymentOnce(generation) {
     );
 
     el("paymentMessage").textContent =
-      "Estamos teniendo una demora al comprobar tu CV. Vamos a intentarlo nuevamente. No vuelvas a pagar.";
+      "Estamos teniendo una demora al comprobar tu CV. " +
+      "Vamos a intentarlo nuevamente. No vuelvas a pagar.";
 
     shouldRetry = true;
 
@@ -969,62 +1657,71 @@ function verifyPayment() {
   beginAutomaticPaymentCheck();
 }
 
-// GENERADOR DE PDF DIRECTO
+
+// ========================================
+// GENERACIÓN DE PDF
+// ========================================
 
 function crearDocumentoPDF() {
   if (!window.jspdf || !window.jspdf.jsPDF) {
     throw new Error(
-      "No se pudo cargar el generador de PDF. Revisá tu conexión a Internet e intentá nuevamente."
+      "No se pudo cargar el generador de PDF. " +
+      "Revisá tu conexión a Internet e intentá nuevamente."
     );
   }
 
   return new window.jspdf.jsPDF({
-    orientation:"portrait",
-    unit:"mm",
-    format:"a4",
-    compress:true
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+    compress: true
   });
 }
 
 function nombreArchivoCV(nombre) {
   const limpio = String(nombre || "Curriculum")
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-zA-Z0-9 ]/g,"")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
     .trim()
-    .replace(/\s+/g,"_")
-    .slice(0,60);
+    .replace(/\s+/g, "_")
+    .slice(0, 60);
 
   return "CV_" + (limpio || "Curriculum") + ".pdf";
 }
 
 function crearEscritorPDF(pdf) {
   const limite = 281;
+
   const estado = {
-    principal:{pagina:1,y:17},
-    lateral:{pagina:1,y:17},
-    unica:{pagina:1,y:20}
+    principal: { pagina: 1, y: 17 },
+    lateral: { pagina: 1, y: 17 },
+    unica: { pagina: 1, y: 20 }
   };
 
   function pagina(n) {
     while (pdf.getNumberOfPages() < n) {
       pdf.addPage();
     }
+
     pdf.setPage(n);
   }
 
-  function espacio(col,alto) {
+  function espacio(col, alto) {
     const s = estado[col];
+
     if (s.y + alto > limite) {
       s.pagina++;
       s.y = 18;
     }
+
     pagina(s.pagina);
     return s;
   }
 
-  function texto(valor,col,x,ancho,opt={}) {
+  function texto(valor, col, x, ancho, opt = {}) {
     valor = String(valor ?? "").trim();
+
     if (!valor) return;
 
     const size = opt.tamano || 10;
@@ -1032,29 +1729,31 @@ function crearEscritorPDF(pdf) {
     const lh = size * 0.3528 * leading;
     const font = opt.fuente || "helvetica";
     const style = opt.negrita ? "bold" : "normal";
-    const color = opt.color || [25,30,42];
+    const color = opt.color || [25, 30, 42];
 
-    pdf.setFont(font,style);
+    pdf.setFont(font, style);
     pdf.setFontSize(size);
 
-    for (const parrafo of valor.replace(/\r/g,"").split("\n")) {
+    for (const parrafo of valor.replace(/\r/g, "").split("\n")) {
       const lineas = pdf.splitTextToSize(
         parrafo || " ",
         ancho
       );
 
       for (const linea of lineas) {
-        const s = espacio(col,lh+1);
+        const s = espacio(col, lh + 1);
 
-        pdf.setFont(font,style);
+        pdf.setFont(font, style);
         pdf.setFontSize(size);
         pdf.setTextColor(...color);
 
         pdf.text(
           linea,
-          opt.centrado ? x+ancho/2 : x,
+          opt.centrado ? x + ancho / 2 : x,
           s.y,
-          {align:opt.centrado ? "center" : "left"}
+          {
+            align: opt.centrado ? "center" : "left"
+          }
         );
 
         s.y += lh;
@@ -1064,35 +1763,39 @@ function crearEscritorPDF(pdf) {
     estado[col].y += opt.despues ?? 3;
   }
 
-  function titulo(valor,col,x,ancho,opt={}) {
-    espacio(col,9);
-    texto(valor,col,x,ancho,{
-      tamano:opt.tamano || 14,
-      fuente:opt.fuente || "times",
-      negrita:true,
-      color:opt.color || [40,88,167],
-      interlineado:1.2,
-      despues:5
+  function titulo(valor, col, x, ancho, opt = {}) {
+    espacio(col, 9);
+
+    texto(valor, col, x, ancho, {
+      tamano: opt.tamano || 14,
+      fuente: opt.fuente || "times",
+      negrita: true,
+      color: opt.color || [40, 88, 167],
+      interlineado: 1.2,
+      despues: 5
     });
   }
 
-  function seccion(t,v,col,x,ancho,opt={}) {
+  function seccion(t, v, col, x, ancho, opt = {}) {
     if (!String(v ?? "").trim()) return;
 
-    titulo(t,col,x,ancho,opt);
+    titulo(t, col, x, ancho, opt);
 
-    texto(v,col,x,ancho,{
-      tamano:opt.textoTamano || 9.5,
-      despues:9,
-      color:[24,24,24]
+    texto(v, col, x, ancho, {
+      tamano: opt.textoTamano || 9.5,
+      despues: 9,
+      color: [24, 24, 24]
     });
   }
 
-  function linea(col,x,ancho) {
-    const s = espacio(col,3);
-    pdf.setDrawColor(210,210,210);
+  function linea(col, x, ancho) {
+    const s = espacio(col, 3);
+
+    pdf.setDrawColor(210, 210, 210);
     pdf.setLineWidth(0.25);
-    pdf.line(x,s.y,x+ancho,s.y);
+
+    pdf.line(x, s.y, x + ancho, s.y);
+
     s.y += 5;
   }
 
@@ -1112,53 +1815,64 @@ async function prepararFotoPDF(dataUrl) {
 
   const img = new Image();
 
-  await new Promise((ok,fail) => {
+  await new Promise((ok, fail) => {
     img.onload = ok;
+
     img.onerror = () => fail(
       new Error("No se pudo preparar la foto")
     );
+
     img.src = dataUrl;
   });
 
   const canvas = document.createElement("canvas");
+
   canvas.width = 600;
   canvas.height = 470;
 
   const ctx = canvas.getContext("2d");
+
   if (!ctx) {
     throw new Error("No se pudo procesar la foto");
   }
 
   const iw = img.naturalWidth;
   const ih = img.naturalHeight;
-  const ratio = 600/470;
+  const ratio = 600 / 470;
 
   let sw = iw;
   let sh = ih;
   let sx = 0;
   let sy = 0;
 
-  if (iw/ih > ratio) {
-    sw = ih*ratio;
-    sx = (iw-sw)/2;
+  if (iw / ih > ratio) {
+    sw = ih * ratio;
+    sx = (iw - sw) / 2;
   } else {
-    sh = iw/ratio;
-    sy = (ih-sh)*0.25;
+    sh = iw / ratio;
+    sy = (ih - sh) * 0.25;
   }
 
   ctx.fillStyle = "#fff";
-  ctx.fillRect(0,0,600,470);
+  ctx.fillRect(0, 0, 600, 470);
+
   ctx.drawImage(
     img,
-    sx,sy,sw,sh,
-    0,0,600,470
+    sx, sy, sw, sh,
+    0, 0, 600, 470
   );
 
-  return canvas.toDataURL("image/jpeg",0.9);
+  return canvas.toDataURL("image/jpeg", 0.9);
 }
 
-async function generarPDFModerno(pdf,datos,foto) {
+
+// ========================================
+// PDF MODERNO
+// ========================================
+
+async function generarPDFModerno(pdf, datos, foto) {
   const w = crearEscritorPDF(pdf);
+
   const x = 17;
   const ancho = 109;
   const sideX = 135;
@@ -1170,12 +1884,12 @@ async function generarPDFModerno(pdf,datos,foto) {
     x,
     ancho,
     {
-      tamano:28,
-      fuente:"times",
-      negrita:true,
-      color:[20,20,20],
-      interlineado:1.1,
-      despues:13
+      tamano: 28,
+      fuente: "times",
+      negrita: true,
+      color: [20, 20, 20],
+      interlineado: 1.1,
+      despues: 13
     }
   );
 
@@ -1195,34 +1909,37 @@ async function generarPDFModerno(pdf,datos,foto) {
       ancho
     );
 
-    const inicio = w.estado.principal.y-2;
+    const inicio = w.estado.principal.y - 2;
     const paginaInicio = w.estado.principal.pagina;
 
     w.texto(
       datos.experiencia,
       "principal",
-      x+5,
-      ancho-5,
+      x + 5,
+      ancho - 5,
       {
-        tamano:9.5,
-        despues:9,
-        color:[24,24,24]
+        tamano: 9.5,
+        despues: 9,
+        color: [24, 24, 24]
       }
     );
 
-    const fin = w.estado.principal.y-9;
+    const fin = w.estado.principal.y - 9;
     const paginaFin = w.estado.principal.pagina;
 
-    pdf.setDrawColor(210,210,210);
+    pdf.setDrawColor(210, 210, 210);
     pdf.setLineWidth(0.5);
 
-    for (let p=paginaInicio;p<=paginaFin;p++) {
+    for (let p = paginaInicio; p <= paginaFin; p++) {
       w.pagina(p);
+
       pdf.line(
-        x+0.4,
-        p===paginaInicio ? inicio : 18,
-        x+0.4,
-        p===paginaFin ? Math.max(inicio+5,fin) : 280
+        x + 0.4,
+        p === paginaInicio ? inicio : 18,
+        x + 0.4,
+        p === paginaFin
+          ? Math.max(inicio + 5, fin)
+          : 280
       );
     }
   }
@@ -1245,7 +1962,7 @@ async function generarPDFModerno(pdf,datos,foto) {
 
   if (foto) {
     const jpeg = await prepararFotoPDF(foto);
-    const s = w.espacio("lateral",50);
+    const s = w.espacio("lateral", 50);
 
     pdf.addImage(
       jpeg,
@@ -1259,79 +1976,176 @@ async function generarPDFModerno(pdf,datos,foto) {
     s.y += 54;
   }
 
-  function recuadro(titulo,contenido,contacto=false) {
+  function recuadro(titulo, contenido, contacto = false) {
     const partes = contacto
-      ? [datos.telefono,datos.email,datos.ciudad].filter(v=>String(v || "").trim())
-      : [contenido].filter(v=>String(v || "").trim());
+      ? [
+          datos.telefono,
+          datos.email,
+          datos.ciudad
+        ].filter(v => String(v || "").trim())
+      : [contenido].filter(v => String(v || "").trim());
+
     if (!partes.length) return;
 
-    const padding=5.5, interno=sideW-2*padding;
-    const altoLinea=9*0.3528*1.45;
-    pdf.setFont("helvetica","normal");
+    const padding = 5.5;
+    const interno = sideW - 2 * padding;
+    const altoLinea = 9 * 0.3528 * 1.45;
+
+    pdf.setFont("helvetica", "normal");
     pdf.setFontSize(9);
-    const bloques=partes.map(v=>String(v).replace(/\r/g,"").split("\n")
-      .flatMap(linea=>pdf.splitTextToSize(linea||" ",interno)));
-    const altoTitulo=15;
-    const altoContenido=bloques.reduce((sum,lineas)=>sum+lineas.length*altoLinea+5,0);
-    const alto=Math.max(25,padding+altoTitulo+altoContenido+padding);
+
+    const bloques = partes.map(v =>
+      String(v)
+        .replace(/\r/g, "")
+        .split("\n")
+        .flatMap(linea =>
+          pdf.splitTextToSize(linea || " ", interno)
+        )
+    );
+
+    const altoTitulo = 15;
+
+    const altoContenido = bloques.reduce(
+      (sum, lineas) =>
+        sum + lineas.length * altoLinea + 5,
+      0
+    );
+
+    const alto = Math.max(
+      25,
+      padding + altoTitulo + altoContenido + padding
+    );
+
     if (alto > 240) {
-      w.titulo(titulo,"lateral",sideX+padding,interno,{tamano:14});
-      partes.forEach(v=>w.texto(v,"lateral",sideX+padding,interno,{tamano:9,despues:5}));
+      w.titulo(
+        titulo,
+        "lateral",
+        sideX + padding,
+        interno,
+        { tamano: 14 }
+      );
+
+      partes.forEach(v => {
+        w.texto(
+          v,
+          "lateral",
+          sideX + padding,
+          interno,
+          {
+            tamano: 9,
+            despues: 5
+          }
+        );
+      });
+
       return;
     }
 
-    const s=w.espacio("lateral",Math.min(alto,260));
-    const inicioY=s.y;
-    const paginaInicio=s.pagina;
-    pdf.setDrawColor(185,185,185);
+    const s = w.espacio(
+      "lateral",
+      Math.min(alto, 260)
+    );
+
+    const inicioY = s.y;
+    const paginaInicio = s.pagina;
+
+    pdf.setDrawColor(185, 185, 185);
     pdf.setLineWidth(0.3);
-    pdf.rect(sideX,inicioY,sideW,Math.min(alto,260));
-    let y=inicioY+padding+5;
-    pdf.setFont("times","bold");
+
+    pdf.rect(
+      sideX,
+      inicioY,
+      sideW,
+      Math.min(alto, 260)
+    );
+
+    let y = inicioY + padding + 5;
+
+    pdf.setFont("times", "bold");
     pdf.setFontSize(14);
-    pdf.setTextColor(40,88,167);
-    pdf.text(titulo,sideX+padding,y);
-    y=inicioY+padding+altoTitulo;
-    pdf.setFont("helvetica","normal");
+    pdf.setTextColor(40, 88, 167);
+
+    pdf.text(
+      titulo,
+      sideX + padding,
+      y
+    );
+
+    y = inicioY + padding + altoTitulo;
+
+    pdf.setFont("helvetica", "normal");
     pdf.setFontSize(9);
-    pdf.setTextColor(24,24,24);
-    bloques.forEach((lineas,indice)=>{
-      lineas.forEach(linea=>{
-        pdf.text(linea,sideX+padding,y);
-        y+=altoLinea;
+    pdf.setTextColor(24, 24, 24);
+
+    bloques.forEach((lineas, indice) => {
+      lineas.forEach(linea => {
+        pdf.text(
+          linea,
+          sideX + padding,
+          y
+        );
+
+        y += altoLinea;
       });
-      if(contacto && indice<bloques.length-1){
-        y+=1.5;
-        pdf.setDrawColor(215,215,215);
+
+      if (
+        contacto &&
+        indice < bloques.length - 1
+      ) {
+        y += 1.5;
+
+        pdf.setDrawColor(215, 215, 215);
         pdf.setLineWidth(0.22);
-        pdf.line(sideX+padding,y,sideX+sideW-padding,y);
-        y+=3.5;
-      } else y+=5;
+
+        pdf.line(
+          sideX + padding,
+          y,
+          sideX + sideW - padding,
+          y
+        );
+
+        y += 3.5;
+      } else {
+        y += 5;
+      }
     });
-    w.estado.lateral.pagina=paginaInicio;
-    w.estado.lateral.y=Math.max(y+padding,inicioY+alto+6);
+
+    w.estado.lateral.pagina = paginaInicio;
+
+    w.estado.lateral.y = Math.max(
+      y + padding,
+      inicioY + alto + 6
+    );
   }
 
-  recuadro("Contacto","",true);
-  recuadro("Formación",datos.educacion);
-  recuadro("Competencias",datos.habilidades);
+  recuadro("Contacto", "", true);
+  recuadro("Formación", datos.educacion);
+  recuadro("Competencias", datos.habilidades);
 }
 
-function generarPDFATS(pdf,datos) {
+
+// ========================================
+// PDF ATS
+// ========================================
+
+function generarPDFATS(pdf, datos) {
   const w = crearEscritorPDF(pdf);
+
   const x = 20;
   const ancho = 170;
 
   w.texto(
-    String(datos.nombre || "Currículum").toUpperCase(),
+    String(
+      datos.nombre || "Currículum"
+    ).toUpperCase(),
     "unica",
     x,
     ancho,
     {
-      tamano:19,
-      negrita:true,
-      centrado:true,
-      despues:5
+      tamano: 19,
+      negrita: true,
+      centrado: true,
+      despues: 5
     }
   );
 
@@ -1345,24 +2159,24 @@ function generarPDFATS(pdf,datos) {
     x,
     ancho,
     {
-      tamano:9,
-      centrado:true,
-      despues:5
+      tamano: 9,
+      centrado: true,
+      despues: 5
     }
   );
 
-  w.linea("unica",x,ancho);
+  w.linea("unica", x, ancho);
 
   const secciones = [
-    ["PERFIL PROFESIONAL",datos.perfil],
-    ["EDUCACIÓN",datos.educacion],
-    ["EXPERIENCIA PROFESIONAL",datos.experiencia],
-    ["HABILIDADES",datos.habilidades],
-    ["CERTIFICACIONES Y CURSOS",datos.cursos],
-    ["IDIOMAS",datos.idiomas]
+    ["PERFIL PROFESIONAL", datos.perfil],
+    ["EDUCACIÓN", datos.educacion],
+    ["EXPERIENCIA PROFESIONAL", datos.experiencia],
+    ["HABILIDADES", datos.habilidades],
+    ["CERTIFICACIONES Y CURSOS", datos.cursos],
+    ["IDIOMAS", datos.idiomas]
   ];
 
-  for (const [titulo,contenido] of secciones) {
+  for (const [titulo, contenido] of secciones) {
     w.seccion(
       titulo,
       contenido,
@@ -1370,13 +2184,18 @@ function generarPDFATS(pdf,datos) {
       x,
       ancho,
       {
-        tamano:11,
-        textoTamano:10,
-        color:[20,20,20]
+        tamano: 11,
+        textoTamano: 10,
+        color: [20, 20, 20]
       }
     );
   }
 }
+
+
+// ========================================
+// DESCARGA DEL CV
+// ========================================
 
 let pdfDownloading = false;
 
@@ -1394,7 +2213,8 @@ async function downloadCV() {
     !paidPhoto
   ) {
     alert(
-      "Todavía no pudimos recuperar tu foto. Esperá a que termine la comprobación del pago."
+      "Todavía no pudimos recuperar tu foto. " +
+      "Esperá a que termine la comprobación del pago."
     );
     return;
   }
@@ -1405,15 +2225,15 @@ async function downloadCV() {
   pdfDownloading = true;
   boton.disabled = true;
   boton.textContent = "Generando PDF...";
+
   mensaje.textContent =
     "Preparando el archivo en tu dispositivo...";
 
   try {
     const pdf = crearDocumentoPDF();
-    const datos = Object.fromEntries(
-      Object.entries(paidCV.datos_cv).map(([clave,valor]) =>
-        [clave, typeof valor === "string" && clave !== "foto_path" ? formatoBasico(valor) : valor]
-      )
+
+    const datos = mejorarDatosCV(
+      paidCV.datos_cv
     );
 
     if (paidCV.diseno === "modern") {
@@ -1423,15 +2243,18 @@ async function downloadCV() {
         paidPhoto
       );
     } else {
-      generarPDFATS(pdf,datos);
+      generarPDFATS(pdf, datos);
     }
 
-    const nombre = nombreArchivoCV(datos.nombre);
+    const nombre = nombreArchivoCV(
+      datos.nombre
+    );
 
     pdf.save(nombre);
 
     mensaje.textContent =
-      "El PDF fue generado. Revisá las descargas de tu navegador. En algunos celulares puede aparecer la opción de guardar o compartir el archivo.";
+      "El PDF fue generado. " +
+      "Revisá las descargas de tu navegador.";
 
   } catch (error) {
     console.error(
@@ -1440,7 +2263,8 @@ async function downloadCV() {
     );
 
     mensaje.textContent =
-      "No pudimos generar el PDF. Podés volver a intentarlo sin pagar otra vez.";
+      "No pudimos generar el PDF. " +
+      "Podés volver a intentarlo sin pagar otra vez.";
 
     alert(
       "No se pudo generar el PDF: " +
@@ -1450,10 +2274,16 @@ async function downloadCV() {
   } finally {
     pdfDownloading = false;
     boton.disabled = false;
+
     boton.textContent =
       "Descargar mi CV en PDF";
   }
 }
+
+
+// ========================================
+// INICIO Y RECUPERACIÓN
+// ========================================
 
 window.addEventListener(
   "DOMContentLoaded",
@@ -1476,7 +2306,8 @@ window.addEventListener(
       showCard("paymentCard");
 
       el("paymentMessage").textContent =
-        "Volviste de Mercado Pago, pero no encontramos tu clave en este navegador. No pagues otra vez. Estamos preparando la recuperación por correo electrónico.";
+        "Volviste de Mercado Pago, pero no encontramos " +
+        "tu clave en este navegador. No pagues otra vez.";
 
       el("verifyBtn").hidden = true;
     }
@@ -1491,12 +2322,15 @@ document.addEventListener(
       !el("paymentCard").hidden &&
       !paymentChecking &&
       paymentTimer === null &&
-      localStorage.getItem("micvya_token_descarga")
+      localStorage.getItem(
+        "micvya_token_descarga"
+      )
     ) {
       beginAutomaticPaymentCheck();
     }
   }
 );
+
 </script>
 </body>
 </html>
