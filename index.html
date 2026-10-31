@@ -123,7 +123,7 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 </div>
 <div id="photoFields">
 <label>Foto (opcional, hasta 5 MB)</label>
-<input type="file" id="foto" accept="image/*" onchange="photoChanged(event)">
+<input type="file" id="foto" accept="image/jpeg,image/png,image/webp" onchange="photoChanged(event)">
 </div>
 <p class="hint">El diseño ATS utiliza una columna y texto seleccionable. No garantiza superar todos los sistemas de selección.</p>
 </section>
@@ -173,7 +173,7 @@ footer{text-align:center;padding:25px;font-size:13px;color:#64748b}
 <script>
 let current = 0;
 let design = "modern";
-let photoData = "";
+let photoFile = null;
 let paidCV = null;
 
 const steps = [...document.querySelectorAll(".step")];
@@ -231,11 +231,12 @@ function choose(selected) {
 
 function photoChanged(event) {
   const file = event.target.files[0];
-  photoData = "";
+  photoFile = null;
   if (!file) return;
 
   if (
-    !["image/jpeg","image/png","image/webp"].includes(file.type) ||
+    !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+    file.size === 0 ||
     file.size > 5 * 1024 * 1024
   ) {
     alert("Elegí una foto JPG, PNG o WebP de hasta 5 MB.");
@@ -243,11 +244,71 @@ function photoChanged(event) {
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    photoData = reader.result;
-  };
-  reader.readAsDataURL(file);
+  photoFile = file;
+}
+
+async function subirFotoPrivada(tokenDescarga, file) {
+  const autorizacion = await fetch("/api/subir-foto", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    cache: "no-store",
+    body: JSON.stringify({
+      tokenDescarga,
+      tipo: file.type,
+      tamano: file.size
+    })
+  });
+
+  const permiso = await autorizacion.json();
+  if (!autorizacion.ok) {
+    throw new Error(permiso.error || "No se pudo autorizar la foto");
+  }
+
+  if (
+    permiso.bucket !== "fotos-cv" ||
+    typeof permiso.path !== "string" ||
+    typeof permiso.token !== "string" ||
+    typeof permiso.supabaseUrl !== "string"
+  ) {
+    throw new Error("La autorización de la foto está incompleta");
+  }
+
+  const base = new URL(permiso.supabaseUrl);
+  if (base.protocol !== "https:") {
+    throw new Error("La conexión de fotos no es segura");
+  }
+
+  const ruta = permiso.path.split("/").map(encodeURIComponent).join("/");
+  const urlSubida = new URL(
+    `/storage/v1/object/upload/sign/fotos-cv/${ruta}`,
+    base
+  );
+  urlSubida.searchParams.set("token", permiso.token);
+
+  const subida = await fetch(urlSubida, {
+    method: "PUT",
+    headers: {"Content-Type": file.type},
+    body: file
+  });
+
+  if (!subida.ok) {
+    throw new Error("No se pudo subir la foto a Supabase");
+  }
+
+  const confirmacion = await fetch("/api/confirmar-foto", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    cache: "no-store",
+    body: JSON.stringify({
+      tokenDescarga,
+      path: permiso.path
+    })
+  });
+
+  const resultado = await confirmacion.json();
+  if (!confirmacion.ok || !resultado.ok) {
+    throw new Error(resultado.error || "No se pudo asociar la foto al CV");
+  }
 }
 
 const ejemplo = {
@@ -409,10 +470,16 @@ async function testPayment() {
     // Conservamos la clave aunque se cierre la pestaña.
     localStorage.setItem("micvya_token_descarga",data.tokenDescarga);
 
+    // La foto se sube y se confirma antes de abrir Mercado Pago.
+    if (design === "modern" && photoFile) {
+      button.textContent = "Guardando tu foto...";
+      await subirFotoPrivada(data.tokenDescarga, photoFile);
+    }
+
     window.location.assign(url.href);
 
   } catch (error) {
-    alert("No se pudo abrir el pago: " + error.message);
+    alert("No pudimos completar la preparación del CV: " + error.message + ". No vuelvas a pagar si ya hiciste un pago.");
     button.disabled = false;
     button.textContent = "Pagar $5.000 y obtener mi CV";
   }
