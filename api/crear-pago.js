@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN?.trim();
 
   const supabaseUrl = process.env.SUPABASE_URL
     ?.trim()
@@ -18,9 +18,30 @@ export default async function handler(req, res) {
 
   const supabaseKey = process.env.SUPABASE_SECRET_KEY?.trim();
 
-  if (!token || !supabaseUrl || !supabaseKey) {
+  const notificationUrl =
+    process.env.MERCADOPAGO_NOTIFICATION_URL?.trim();
+
+  if (!token || !supabaseUrl || !supabaseKey || !notificationUrl) {
     return res.status(500).json({
       error: "Falta configurar Mercado Pago o Supabase"
+    });
+  }
+
+  let urlNotificacion;
+
+  try {
+    urlNotificacion = new URL(notificationUrl);
+
+    if (
+      urlNotificacion.protocol !== "https:" ||
+      urlNotificacion.pathname !== "/api/webhook" ||
+      !urlNotificacion.hostname.endsWith(".vercel.app")
+    ) {
+      throw new Error("URL de notificación inválida");
+    }
+  } catch {
+    return res.status(500).json({
+      error: "La dirección del Webhook no es válida"
     });
   }
 
@@ -111,7 +132,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. Crear el pago en Mercado Pago.
+    // 2. Preparar la dirección de regreso.
     const dominio = process.env.VERCEL_URL;
 
     if (!dominio) {
@@ -122,6 +143,7 @@ export default async function handler(req, res) {
 
     const regreso = `https://${dominio}/`;
 
+    // 3. Crear el pago en Mercado Pago.
     const respuestaPago = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
@@ -142,6 +164,11 @@ export default async function handler(req, res) {
             }
           ],
           external_reference: referencia,
+
+          // Dirección a la que Mercado Pago
+          // enviará las notificaciones.
+          notification_url: notificationUrl,
+
           back_urls: {
             success: regreso,
             failure: regreso,
