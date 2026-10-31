@@ -27,10 +27,8 @@ export default async function handler(req, res) {
     });
   }
 
-  let urlNotificacion;
-
   try {
-    urlNotificacion = new URL(notificationUrl);
+    const urlNotificacion = new URL(notificationUrl);
 
     if (
       urlNotificacion.protocol !== "https:" ||
@@ -96,8 +94,16 @@ export default async function handler(req, res) {
 
   const referencia = crypto.randomUUID();
 
+  // Clave privada para acceder al CV después del pago.
+  const tokenDescarga = crypto.randomBytes(32).toString("hex");
+
+  // Supabase guarda solamente la huella de la clave.
+  const tokenDescargaHash = crypto
+    .createHash("sha256")
+    .update(tokenDescarga)
+    .digest("hex");
+
   try {
-    // 1. Guardar el currículum en Supabase.
     const rutaSupabase = new URL(
       "/rest/v1/solicitudes_cv",
       supabaseUrl
@@ -116,7 +122,8 @@ export default async function handler(req, res) {
           datos_cv,
           diseno,
           estado_pago: "pendiente",
-          referencia_pago: referencia
+          referencia_pago: referencia,
+          token_descarga_hash: tokenDescargaHash
         })
       }
     );
@@ -132,7 +139,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // 2. Preparar la dirección de regreso.
     const dominio = process.env.VERCEL_URL;
 
     if (!dominio) {
@@ -143,7 +149,6 @@ export default async function handler(req, res) {
 
     const regreso = `https://${dominio}/`;
 
-    // 3. Crear el pago en Mercado Pago.
     const respuestaPago = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
@@ -164,11 +169,7 @@ export default async function handler(req, res) {
             }
           ],
           external_reference: referencia,
-
-          // Dirección a la que Mercado Pago
-          // enviará las notificaciones.
           notification_url: notificationUrl,
-
           back_urls: {
             success: regreso,
             failure: regreso,
@@ -203,7 +204,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       preferenceId: datosPago.id,
-      checkoutUrl
+      checkoutUrl,
+      tokenDescarga
     });
 
   } catch (error) {
